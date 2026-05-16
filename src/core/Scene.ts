@@ -61,8 +61,8 @@ export class SceneManager {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.container.append(this.renderer.domElement);
 
-    this.camera.position.set(0, 3.67, 24);
-    this.camera.lookAt(0, 4.5, 3);
+    this.camera.position.set(0, 7.5, 24);
+    this.camera.lookAt(0, 5.5, 3);
 
     this.scene.add(new THREE.AmbientLight(0xf7efe2, 1.5));
 

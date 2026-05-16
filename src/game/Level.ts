@@ -19,7 +19,8 @@ export interface LevelConfig {
 
 export class Level {
   public readonly rootGroup = new THREE.Group();
-  private readonly shadowDirection = new THREE.Vector3(0, 3.35, -10).normalize();
+  // experiment/shadow-rotation: 光几乎水平，使物体/光源/平台三者高度尽量接近
+  private readonly shadowDirection = new THREE.Vector3(0, 0.3, -20).normalize();
   private readonly shadowMask: ShadowMask;
   private readonly platforms: Platform[] = [];
   private readonly shadowObjects: ShadowObject[] = [];
@@ -332,7 +333,7 @@ export class Level {
 
   private checkBridgeConnected(): void {
     const platTop = this.config.platforms[0].y + this.config.platforms[0].height / 2;
-    const tolerance = 0.15;
+    const tolerance = 0.25; // 光近水平时投影 Y 变化小，适当放宽 tolerance
     const minCoverageRatio = 0.8;
     const sampleCount = 20;
 

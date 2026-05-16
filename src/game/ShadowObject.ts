@@ -74,18 +74,21 @@ export class ShadowObject {
     this.group.position.set(0, data.railY, data.railZ);
     this.initialRotation.set(data.initialRotationX, data.initialRotationY, 0, 'XYZ');
 
-    const displayScale = 0.5;
+    const displayScale = 0.25;  // 物体更小
+    const projScale = 0.8;      // 缩小投影使旋转幅度感知与物体接近
     const shape = data.shape ?? 'box';
     const w = 4.5 * displayScale;
     const h = 1.2 * displayScale;
     const d = 1.2 * displayScale;
+    const pw = 4.5 * projScale;
+    const ph = 1.2 * projScale;
+    const pd = 1.2 * projScale;
     const displayGeometry = shape === 'triangle'
       ? createTrianglePrismGeometry(w, h, d)
       : new THREE.BoxGeometry(w, h, d);
-    // 投影几何体与显示几何体保持相同尺寸，避免阴影旋转幅度远大于物体
     const projectionGeometry = shape === 'triangle'
-      ? createTrianglePrismGeometry(w, h, d)
-      : new THREE.BoxGeometry(w, h, d);
+      ? createTrianglePrismGeometry(pw, ph, pd)
+      : new THREE.BoxGeometry(pw, ph, pd);
 
     const block = new THREE.Mesh(displayGeometry, this.material);
     block.position.set(0, 0, 0);
@@ -156,7 +159,7 @@ export class ShadowObject {
 
   rotate(deltaX: number, deltaY: number): void {
     this.group.rotation.x += deltaX;
-    this.group.rotation.y += deltaY;
+    this.group.rotation.y -= deltaY;
   }
 
   private currentYOffset = 0;
