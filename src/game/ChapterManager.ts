@@ -18,6 +18,9 @@ export class ChapterManager {
   private transitionState: 'idle' | 'sliding' | 'settling' = 'idle';
   private transitionTimer = 0;
   private overlayFader: OverlayFader | null = null;
+  private deferredTransition = false;
+  public onLevelCreated?: (level: Level) => void;
+  public onLevelActivated?: (index: number) => void;
 
   private readonly SETTLE_DELAY = 0.2;
   private readonly FADE_DURATION = 0.5;
@@ -68,6 +71,7 @@ export class ChapterManager {
     this.hud.hideComplete();
     this.hud.setPaused(false);
     this.overlayFader?.fadeIn(0.3);
+    this.onLevelActivated?.(this.currentIndex);
   }
 
   setOverlayFader(overlayFader: OverlayFader): void {
@@ -103,10 +107,25 @@ export class ChapterManager {
   }
 
   private createLevel(index: number): Level {
-    return new Level(this.sceneManager, this.hud, this.chapter.levels[index], () => this.handleLevelComplete());
+    const level = new Level(this.sceneManager, this.hud, this.chapter.levels[index], () => this.handleLevelComplete());
+    this.onLevelCreated?.(level);
+    return level;
   }
 
   private handleLevelComplete(): void {
+    // 延迟过渡模式：不做 SLIDE，由外部（main.ts）控制过渡时机（用于视频/叙事）
+    if (this.deferredTransition) {
+      this.deferredTransition = false;
+      this.currentLevel.setSelectedObject(null);
+      this.nextLevel = this.createLevel(this.currentIndex + 1);
+      this.nextLevel.rootGroup.position.x = this.SLIDE_DISTANCE;
+      this.nextLevel.setVisible(false);
+      // 不启动 SLIDE，transitionState 保持 'idle' 以避免 update 中的 SLIDE 逻辑
+      this.transitionState = 'idle';
+      this.transitionTimer = 0;
+      return;
+    }
+
     this.currentLevel.setVisible(false);
 
     if (this.currentIndex >= this.chapter.levels.length - 1) {
@@ -121,7 +140,42 @@ export class ChapterManager {
     this.transitionState = 'settling';
     this.transitionTimer = 0;
     this.sceneManager.setClipping(true);
+
     this.overlayFader?.fadeOut(this.FADE_DURATION);
+  }
+
+  /**
+   * 延迟过渡：让下一个关卡完成时不启动 SLIDE 动画，
+   * 由外部（main.ts）控制过渡时机（视频/叙事流程专用）。
+   */
+  public deferTransitionToNextLevel(): void {
+    this.deferredTransition = true;
+  }
+
+  /**
+   * 外部（main.ts）在视频/叙事后调用：
+   * 直接将 nextLevel 切换为 currentLevel（无 SLIDE），触发 onLevelActivated。
+   */
+  public completeDeferredTransition(): void {
+    const incomingLevel = this.nextLevel;
+    if (!incomingLevel) {
+      return;
+    }
+
+    const outgoingLevel = this.currentLevel;
+    outgoingLevel.dispose();
+
+    incomingLevel.rootGroup.position.x = 0;
+    incomingLevel.setVisible(true);
+    incomingLevel.finalizeAdjustment();
+
+    this.currentIndex += 1;
+    this.currentLevel = incomingLevel;
+    this.nextLevel = null;
+    this.transitionState = 'idle';
+    this.transitionTimer = 0;
+
+    this.onLevelActivated?.(this.currentIndex);
   }
 
   private finishTransition(): void {
@@ -135,13 +189,16 @@ export class ChapterManager {
     outgoingLevel.dispose();
     incomingLevel.rootGroup.position.x = 0;
     incomingLevel.setVisible(true);
+    incomingLevel.finalizeAdjustment(); // 确保影子在切换完成时刷新
+    this.sceneManager.setClipping(false);
 
     this.currentIndex += 1;
     this.currentLevel = incomingLevel;
     this.nextLevel = null;
     this.transitionState = 'idle';
     this.transitionTimer = 0;
-    this.sceneManager.setClipping(false);
+    this.onLevelActivated?.(this.currentIndex);
+
     this.overlayFader?.fadeIn(this.FADE_DURATION);
   }
 }

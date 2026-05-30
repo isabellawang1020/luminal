@@ -52,6 +52,55 @@ export function findNearestWalkable(
   return null;
 }
 
+/**
+ * Line-of-sight 检查：两个 cell 之间的直线（Bresenham）是否全在 walkable cell 上。
+ */
+export function hasLineOfSight(
+  mask: Uint8Array,
+  width: number,
+  a: GridCell,
+  b: GridCell,
+): boolean {
+  let x0 = a.col, y0 = a.row;
+  const x1 = b.col, y1 = b.row;
+  const dx = Math.abs(x1 - x0);
+  const dy = Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let err = dx - dy;
+  while (true) {
+    if (mask[y0 * width + x0] !== 1) return false;
+    if (x0 === x1 && y0 === y1) return true;
+    const e2 = 2 * err;
+    if (e2 > -dy) { err -= dy; x0 += sx; }
+    if (e2 < dx) { err += dx; y0 += sy; }
+  }
+}
+
+/**
+ * 路径压平：用 line-of-sight 贪心简化。
+ * 对每个点贪心找最远可见点，去掉中间冗余拐点（如 BFS 选爬阶梯路径，能简化为直线）。
+ */
+export function losSimplifyPath(
+  path: GridCell[],
+  mask: Uint8Array,
+  width: number,
+): GridCell[] {
+  if (path.length <= 2) return path;
+  const result: GridCell[] = [path[0]];
+  let i = 0;
+  while (i < path.length - 1) {
+    let j = path.length - 1;
+    // 找从 i 看得到的最远 j
+    while (j > i + 1 && !hasLineOfSight(mask, width, path[i], path[j])) {
+      j -= 1;
+    }
+    result.push(path[j]);
+    i = j;
+  }
+  return result;
+}
+
 export function simplifyPath(path: GridCell[]): GridCell[] {
   if (path.length <= 2) {
     return path;
@@ -76,6 +125,10 @@ export function simplifyPath(path: GridCell[]): GridCell[] {
   return simplified;
 }
 
+/**
+ * BFS 寻路：8 邻居等权。简单可靠。
+ * 注意：可能找出"爬阶梯绕远"的"少 cell 路径"，需要在 Level 层处理（如限制垂直 cell 数或后处理路径）。
+ */
 export function findPath(
   mask: Uint8Array,
   width: number,
@@ -95,10 +148,7 @@ export function findPath(
 
   while (queue.length > 0) {
     const current = queue.shift();
-    if (!current) {
-      break;
-    }
-
+    if (!current) break;
     if (current.col === end.col && current.row === end.row) {
       const result: GridCell[] = [];
       let pointer = key(end, width);
@@ -108,23 +158,15 @@ export function findPath(
       }
       return simplifyPath(result.reverse());
     }
-
     for (const [dx, dy] of NEIGHBORS) {
       const next = { col: current.col + dx, row: current.row + dy };
-      if (next.col < 0 || next.col >= width || next.row < 0 || next.row >= height) {
-        continue;
-      }
-
+      if (next.col < 0 || next.col >= width || next.row < 0 || next.row >= height) continue;
       const nextKey = key(next, width);
-      if (visited[nextKey] === 1 || mask[nextKey] !== 1) {
-        continue;
-      }
-
+      if (visited[nextKey] === 1 || mask[nextKey] !== 1) continue;
       visited[nextKey] = 1;
       previous[nextKey] = key(current, width);
       queue.push(next);
     }
   }
-
   return null;
 }

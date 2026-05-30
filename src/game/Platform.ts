@@ -6,6 +6,10 @@ export interface PlatformData {
   y: number;
   width: number;
   height: number;
+  /** 透明度，默认 1.0 */
+  opacity?: number;
+  /** 颜色，默认 '#625048' */
+  color?: string;
 }
 
 function createRoundedRectShape(width: number, height: number, radius: number): THREE.Shape {
@@ -39,14 +43,18 @@ export class Platform {
     geometry.center();
 
     const material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#625048'),
+      color: new THREE.Color(data.color ?? '#625048'),
       roughness: 0.88,
       metalness: 0.06,
+      depthTest: false,
+      transparent: true,
+      opacity: data.opacity ?? 1.0,
     });
 
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.set(data.x, data.y, 0.18);
     this.mesh.castShadow = false;
     this.mesh.receiveShadow = true;
+    this.mesh.renderOrder = 0; // 平台：最下层
   }
 }

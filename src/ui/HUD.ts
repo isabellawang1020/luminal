@@ -1,10 +1,19 @@
+import { Locale } from '@/core/Locale';
+
 export class HUD {
   public readonly root: HTMLElement;
   private readonly toast: HTMLDivElement;
   private readonly centerMessage: HTMLDivElement;
   private readonly subMessage: HTMLDivElement;
   private readonly pausePanel: HTMLDivElement;
+  private readonly levelLabel: HTMLDivElement;
+  private readonly bgmButton: HTMLButtonElement;
+  private readonly langButton: HTMLButtonElement;
   private toastTimer = 0;
+  private bgmMuted = false;
+  private onBgmToggle?: (muted: boolean) => void;
+  private onLangToggle?: (lang: 'zh' | 'en') => void;
+  private resumeAction?: () => void;
 
   constructor(parent: HTMLElement) {
     this.root = document.createElement('div');
@@ -22,8 +31,83 @@ export class HUD {
     topLeft.style.background = 'rgba(255,255,255,0.46)';
     topLeft.style.backdropFilter = 'blur(14px)';
     topLeft.style.boxShadow = '0 10px 30px rgba(85,64,40,0.12)';
-    topLeft.innerHTML = '<strong style="display:block;font-size:18px;">光语 · Luminal</strong><span style="font-size:13px;color:#6d5d52;">拖动物体，让影子补上断桥</span>';
+    topLeft.innerHTML = '<strong style="display:block;font-size:18px;text-align:center;">光语 · Luminal</strong>';
+
+    // 关卡号副标题（在主标题下方，居中显示）
+    this.levelLabel = document.createElement('div');
+    Object.assign(this.levelLabel.style, {
+      display: 'block',
+      marginTop: '4px',
+      fontSize: '13px',
+      color: 'rgba(85, 64, 40, 0.78)',
+      letterSpacing: '0.12em',
+      fontWeight: '500',
+      textAlign: 'center',
+    });
+    topLeft.append(this.levelLabel);
+
     this.root.append(topLeft);
+
+    // BGM 控制按钮（独立的，在白色面板下方）
+    this.bgmButton = document.createElement('button');
+    Object.assign(this.bgmButton.style, {
+      position: 'absolute',
+      top: '115px',
+      left: '24px',
+      padding: '5px 14px',
+      border: 'none',
+      borderRadius: '8px',
+      background: '#063654',
+      backdropFilter: 'blur(10px)',
+      color: '#ffffff',
+      fontSize: '12px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'background 0.2s',
+      pointerEvents: 'auto',
+      boxShadow: '0 4px 14px rgba(85,64,40,0.10)',
+      letterSpacing: '0.04em',
+    });
+    this.bgmButton.textContent = Locale.current === 'zh' ? '🔊 BGM: 开' : '🔊 BGM: On';
+    this.bgmButton.addEventListener('click', () => this.toggleBgm());
+    this.bgmButton.addEventListener('pointerenter', () => {
+      this.bgmButton.style.background = '#0a4a6e';
+    });
+    this.bgmButton.addEventListener('pointerleave', () => {
+      this.bgmButton.style.background = '#063654';
+    });
+    this.root.append(this.bgmButton);
+
+    // 语言切换按钮（在 BGM 按钮下方）
+    this.langButton = document.createElement('button');
+    Object.assign(this.langButton.style, {
+      position: 'absolute',
+      top: '152px',
+      left: '24px',
+      padding: '5px 14px',
+      border: 'none',
+      borderRadius: '8px',
+      background: '#063654',
+      backdropFilter: 'blur(10px)',
+      color: '#ffffff',
+      fontSize: '12px',
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'background 0.2s',
+      pointerEvents: 'auto',
+      boxShadow: '0 4px 14px rgba(85,64,40,0.10)',
+      letterSpacing: '0.04em',
+    });
+    this.langButton.textContent = '🌐 中 / EN';
+    this.langButton.dataset.lang = 'zh';
+    this.langButton.addEventListener('click', () => this.toggleLang());
+    this.langButton.addEventListener('pointerenter', () => {
+      this.langButton.style.background = '#0a4a6e';
+    });
+    this.langButton.addEventListener('pointerleave', () => {
+      this.langButton.style.background = '#063654';
+    });
+    this.root.append(this.langButton);
 
     this.toast = document.createElement('div');
     this.toast.style.position = 'absolute';
@@ -70,17 +154,80 @@ export class HUD {
     this.pausePanel.style.alignItems = 'center';
     this.pausePanel.style.justifyContent = 'center';
     this.pausePanel.style.background = 'rgba(40, 31, 22, 0.28)';
-    this.pausePanel.innerHTML = `
-      <div style="pointer-events:auto; min-width:300px; padding:28px 30px; border-radius:24px; background:rgba(255,248,238,0.92); box-shadow:0 20px 50px rgba(64,43,21,0.16); text-align:center;">
-        <div style="font-size:28px; margin-bottom:8px;">已暂停</div>
-        <div style="font-size:14px; color:#6e6054; margin-bottom:18px;">按 Esc 重新开始本关，或点击继续。</div>
-        <button data-action="resume" style="border:none; background:#6f60f4; color:#fff; padding:10px 18px; border-radius:999px; cursor:pointer; font-size:14px;">继续</button>
-      </div>
-    `;
+    this.renderPausePanel();
     this.root.append(this.pausePanel);
   }
 
+  setLevelLabel(text: string): void {
+    this.levelLabel.textContent = text;
+  }
+
+  setBgmCallback(callback: (muted: boolean) => void): void {
+    this.onBgmToggle = callback;
+  }
+
+  setLangCallback(callback: (lang: 'zh' | 'en') => void): void {
+    this.onLangToggle = callback;
+  }
+
+  private toggleBgm(): void {
+    this.bgmMuted = !this.bgmMuted;
+    this.bgmButton.textContent = this.bgmMuted
+      ? (Locale.current === 'zh' ? '🔇 BGM: 关' : '🔇 BGM: Off')
+      : (Locale.current === 'zh' ? '🔊 BGM: 开' : '🔊 BGM: On');
+    this.onBgmToggle?.(this.bgmMuted);
+  }
+
+  /** 语言切换时刷新动态显示的文本（BGM 按钮状态、暂停面板） */
+  refreshLocalizedText(): void {
+    this.bgmButton.textContent = this.bgmMuted
+      ? (Locale.current === 'zh' ? '🔇 BGM: 关' : '🔇 BGM: Off')
+      : (Locale.current === 'zh' ? '🔊 BGM: 开' : '🔊 BGM: On');
+    if (this.pausePanel.style.display === 'flex') {
+      this.renderPausePanel();
+    }
+  }
+
+  private toggleLang(): void {
+    // 按钮显示当前语言；点击切换到另一个语言
+    const currentIsZh = this.langButton.textContent?.includes('中 / EN') !== false;
+    // 读取 Locale 当前状态（通过回调用）→ 由外部维护
+    const next: 'zh' | 'en' = this.langButton.dataset.lang === 'zh' ? 'en' : 'zh';
+    this.langButton.dataset.lang = next;
+    this.langButton.textContent = next === 'zh' ? '🌐 中 / EN' : '🌐 EN / 中';
+    this.onLangToggle?.(next);
+  }
+
+  setPaused(paused: boolean): void {
+    this.pausePanel.style.display = paused ? 'flex' : 'none';
+    if (paused) this.renderPausePanel();
+  }
+
+  /** 语言切换时调用：如果暂停面板正在显示，重新渲染文本 */
+  refreshPausedText(): void {
+    if (this.pausePanel.style.display === 'flex') this.renderPausePanel();
+  }
+
+  private renderPausePanel(): void {
+    // 重建 HTML 以刷新语言文本（避免丢失 resume 按钮的事件监听）
+    const prevButton = this.pausePanel.querySelector('button[data-action="resume"]');
+    const hadListener = prevButton !== null;
+    this.pausePanel.innerHTML = `
+      <div style="pointer-events:auto; min-width:300px; padding:28px 30px; border-radius:24px; background:rgba(255,248,238,0.92); box-shadow:0 20px 50px rgba(64,43,21,0.16); text-align:center;">
+        <div style="font-size:28px; margin-bottom:8px;">${Locale.t('已暂停', 'Paused')}</div>
+        <div style="font-size:14px; color:#6e6054; margin-bottom:18px;">${Locale.t('按 Esc 重新开始，或点选继续', 'Press Esc to restart, or click to continue')}</div>
+        <button data-action="resume" style="border:none; background:#6f60f4; color:#fff; padding:10px 18px; border-radius:999px; cursor:pointer; font-size:14px;">${Locale.t('继续', 'Continue')}</button>
+      </div>
+    `;
+    // 重新绑定 resume 回调
+    if (this.resumeAction) {
+      const btn = this.pausePanel.querySelector('button[data-action="resume"]');
+      btn?.addEventListener('click', this.resumeAction);
+    }
+  }
+
   bindResume(action: () => void): void {
+    this.resumeAction = action;
     const button = this.pausePanel.querySelector('button[data-action="resume"]');
     button?.addEventListener('click', action);
   }
@@ -95,22 +242,18 @@ export class HUD {
   }
 
   showHintMessage(): void {
-    this.showToast('提示：让影子补上中央断桥');
+    this.showToast(Locale.t('提示：让影子铺上中央缺口', 'Hint: fill the central gap with shadows'));
   }
 
   showComplete(): void {
     this.centerMessage.textContent = 'Level Complete';
     this.centerMessage.style.opacity = '1';
-    this.subMessage.textContent = '光路已通，影行者抵达终点';
+    this.subMessage.textContent = Locale.t('光路已通，影之人抵达终点', 'The path of light is open — the shadow-walker has arrived');
     this.subMessage.style.opacity = '1';
   }
 
   hideComplete(): void {
     this.centerMessage.style.opacity = '0';
     this.subMessage.style.opacity = '0';
-  }
-
-  setPaused(paused: boolean): void {
-    this.pausePanel.style.display = paused ? 'flex' : 'none';
   }
 }

@@ -28,26 +28,58 @@ export class InputManager {
       }
 
       const level = this.getLevel();
+
+      // 优先：点击物体本身 → 选中物体
       const hits = this.sceneManager.raycastObjects(event.clientX, event.clientY, level.pickables);
       if (hits.length > 0) {
         level.selectObjectFromMesh(hits[0].object);
         return;
       }
 
-      if (this.zoneOverlay && this.zoneOverlay.isInMoveZone(event.clientX, event.clientY)) {
-        level.selectLeftmostObject();
-        return;
-      }
-
-      level.setSelectedObject(null);
-
-      if (this.zoneOverlay && !this.zoneOverlay.isInClickZone(event.clientX, event.clientY)) {
-        return;
-      }
-
+      // 取点击的世界坐标
       const wallPoint = this.sceneManager.intersectWall(event.clientX, event.clientY);
-      if (wallPoint) {
-        level.attemptMove(wallPoint);
+      if (!wallPoint) return;
+
+      // 点击位置在最低平台顶面以上
+      if (wallPoint.y >= level.platformTopY) {
+        if (level.isWalkerMoveLocked) {
+          // 移动锁定：忽略，保持物体选中
+          return;
+        }
+        if (level.isWalkerSelected) {
+          // walker 已选中（多角色组场景）：判断点击在哪个组
+          const hitIdx = level.getClickedGroupIndex(wallPoint.x, wallPoint.y);
+          if (hitIdx >= 0 && hitIdx !== level.currentGroupIndex) {
+            // 命中其他组 → 切换到该组
+            level.switchToGroup(hitIdx);
+            level.selectWalker();
+            return;
+          }
+          // 命中当前组或未命中 → 尝试移动
+          level.attemptMove(wallPoint);
+        } else {
+          // walker 未选中：点击任意组 → 切换到该组并选中 walker
+          const hitIdx = level.getClickedGroupIndex(wallPoint.x, wallPoint.y);
+          if (hitIdx >= 0) {
+            if (hitIdx !== level.currentGroupIndex) {
+              level.switchToGroup(hitIdx);
+            }
+            level.selectWalker();
+            return;
+          }
+          // 没有物体选中 或 桥梁已连通 → 选中角色
+          if (!level.selectedObject || level.isBridgeConnected) {
+            level.selectWalker();
+          }
+        }
+        return;
+      }
+
+      // 点击位置在平台以下
+      // 如果已有物体选中 → 保持当前选中（不强制切到最左侧）
+      // 如果没有物体选中 → 选中最左侧可见物体（进入物体操作模式）
+      if (!level.selectedObject) {
+        level.selectLeftmostObject();
       }
     });
 

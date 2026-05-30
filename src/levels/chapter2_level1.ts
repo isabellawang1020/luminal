@@ -1,0 +1,46 @@
+import type { LevelConfig } from '@/game/Level';
+
+export const chapter2Level1: LevelConfig = {
+  name: '章节 2 - 关卡 1',
+  platforms: [
+    { id: 'left-platform', x: -5.2, y: 7.25, width: 5, height: 0.35 },
+    { id: 'right-platform', x: 5.2, y: 9.25, width: 5, height: 0.35 },
+  ],
+  gate: { x: 6.35, y: 8.95, textureUrl: '/textures/gate_new.png', displayHeight: 3.12 },
+  walkerStart: { x: -6.45, y: 7.425 },
+  objects: [
+    {
+      id: 'bear',
+      railMinX: -3.0,
+      railMaxX: 3.0,
+      railY: 6.3,
+      railZ: 16.0,
+      initialT: 0.59,
+      initialRotationX: 0,
+      initialRotationY: 0,
+      initialRotationZ: 0,
+      initialYOffset: 0.76,
+      wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
+      moveLimit: { up: 9, down: 8, left: 5, right: 5 },
+      modelUrl: '/models/bear.glb',
+      modelScale: 0.83,
+      projectionScale: 3.6,
+      useGlbProjection: true,
+    },
+  ],
+  shadowDirection: { x: 0, y: 0.65, z: -20 },
+  bridgeTolerance: 0.1,
+  noGuide: true,
+  hintArea: { x: 0, y: 10.35, width: 3.25, height: 1.05 },
+  hintText: '换个角度，光影自会引路',
+  hintTextEn: 'A new angle — light and shadow will guide you',
+  persistentHint: true,
+  walkerSheet: {
+    url: '/textures/boy_sheet.png',
+    frameCount: 5,
+    frameW: 800,
+    frameH: 1600,
+    height: 1.8,
+    yOffset: 0.0,
+  },
+};

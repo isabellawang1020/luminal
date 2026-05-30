@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { SceneManager } from '@/core/Scene';
 import type { LevelConfig } from '@/game/Level';
+import { Locale } from '@/core/Locale';
 
 export interface ZoneScreenRect {
   left: number;
@@ -10,10 +11,12 @@ export interface ZoneScreenRect {
 }
 
 export class ZoneOverlay {
-  public readonly clickZone: HTMLDivElement;
-  public readonly moveZone: HTMLDivElement;
-  private clickRect: ZoneScreenRect = { left: 0, top: 0, width: 0, height: 0 };
-  private moveRect: ZoneScreenRect = { left: 0, top: 0, width: 0, height: 0 };
+  /** 合并后的操作区域：覆盖平台底边上下，玩家在这里点击操作物体/角色 */
+  public readonly zone: HTMLDivElement;
+  private hintLabel!: HTMLDivElement;
+  private warningLabel!: HTMLDivElement;
+  private warningTimer = 0;
+  private zoneRect: ZoneScreenRect = { left: 0, top: 0, width: 0, height: 0 };
 
   private readonly platLeft: number;
   private readonly platRight: number;
@@ -21,11 +24,16 @@ export class ZoneOverlay {
   private readonly platBottom: number;
   private readonly wallZ: number;
   private fadeTimer = 0;
+  private hintHidden = false;
+
+  // 区域上下扩展尺寸（屏幕像素）
+  private static readonly EXTEND_UP   = 150; // 紧贴平台底边向上覆盖平台本身的高度
+  private static readonly EXTEND_DOWN = 420; // 从平台底边向下延伸（提示玩家操作区）
 
   constructor(
     private readonly sceneManager: SceneManager,
     config: LevelConfig,
-    parent: HTMLElement,
+    private readonly parent: HTMLElement,
     controlPanel: HTMLDivElement,
   ) {
     void controlPanel;
@@ -45,40 +53,81 @@ export class ZoneOverlay {
     this.platBottom = minY;
     this.wallZ = sceneManager.wallBounds.z;
 
-    this.clickZone = this.createZoneDiv('可移动区域', 'rgba(111, 96, 244, 0.35)', '#6f60f4');
-    parent.append(this.clickZone);
+    this.zone = this.createZoneDiv();
+    parent.append(this.zone);
 
-    this.moveZone = this.createZoneDiv('可点击区域', 'rgba(124, 107, 231, 0.30)', '#7c6be7');
-    parent.append(this.moveZone);
+    this.hintLabel = document.createElement('div');
+    this.hintLabel.textContent = config.hintText ?? Locale.t('向上移动，让影子铺出第一道光路', 'Lift upward, and let shadows lay the first beam of light');
+    Object.assign(this.hintLabel.style, {
+      position: 'absolute',
+      fontSize: '24px',
+      fontWeight: '600',
+      color: '#7c6be7',
+      background: 'rgba(255,253,245,0.82)',
+      backdropFilter: 'blur(8px)',
+      padding: '9px 22px',
+      borderRadius: '999px',
+      pointerEvents: 'none',
+      userSelect: 'none',
+      zIndex: '2',
+      whiteSpace: 'nowrap',
+      transform: 'translateX(-50%)',
+    });
+    parent.append(this.hintLabel);
+
+    // 监控 hintLabel style 变化，定位谁在恢复显示
+    new MutationObserver((mutations) => {
+      if (!this.hintHidden) return;
+      for (const m of mutations) {
+        if (m.type === 'attributes' && m.attributeName === 'style') {
+          const vis = this.hintLabel.style.visibility;
+          const op = this.hintLabel.style.opacity;
+          if (vis !== 'hidden' || op !== '0') {
+            console.warn('[ZoneOverlay] hintLabel restored after hideHint!', 'visibility:', vis, 'opacity:', op, new Error().stack);
+            // 立即重新隐藏
+            this.hintLabel.style.visibility = 'hidden';
+            this.hintLabel.style.opacity = '0';
+          }
+        }
+      }
+    }).observe(this.hintLabel, { attributes: true, attributeFilter: ['style'] });
+
+    this.warningLabel = document.createElement('div');
+    this.warningLabel.textContent = Locale.t('当角色站在影子上时，移动物品会使影子消散', 'Moving objects while characters stand on shadows will cause the shadows to fade');
+    Object.assign(this.warningLabel.style, {
+      position: 'absolute',
+      fontSize: '13px',
+      fontWeight: '600',
+      color: '#c0392b',
+      background: 'rgba(255, 240, 238, 0.92)',
+      backdropFilter: 'blur(8px)',
+      padding: '5px 14px',
+      borderRadius: '999px',
+      pointerEvents: 'none',
+      userSelect: 'none',
+      zIndex: '3',
+      whiteSpace: 'nowrap',
+      transform: 'translateX(-50%)',
+      opacity: '0',
+      transition: 'opacity 0.3s ease',
+    });
+    parent.append(this.warningLabel);
 
     this.updateLayout();
   }
 
-  private createZoneDiv(label: string, borderColor: string, textColor: string): HTMLDivElement {
+  private createZoneDiv(): HTMLDivElement {
     const div = document.createElement('div');
     Object.assign(div.style, {
       position: 'absolute',
-      border: `2px solid ${borderColor}`,
-      borderRadius: '12px',
-      background: 'rgba(255, 253, 245, 0.88)',
+      border: 'none',
+      borderRadius: '14px',
+      background: 'rgba(255, 255, 255, 0.28)',
       pointerEvents: 'none',
       transition: 'none',
       opacity: '1',
       zIndex: '1',
     });
-    const tag = document.createElement('span');
-    Object.assign(tag.style, {
-      position: 'absolute',
-      left: '8px',
-      top: '6px',
-      fontSize: '11px',
-      fontWeight: '600',
-      color: textColor,
-      opacity: '0.7',
-      userSelect: 'none',
-    });
-    tag.textContent = label;
-    div.append(tag);
     return div;
   }
 
@@ -87,27 +136,29 @@ export class ZoneOverlay {
   }
 
   fadeIn(duration: number): void {
-    this.clickZone.style.transition = 'none';
-    this.moveZone.style.transition = 'none';
-    this.clickZone.style.opacity = '0';
-    this.moveZone.style.opacity = '0';
+    this.hintHidden = false;
+    this.hintLabel.style.opacity = '1';
+    this.zone.style.transition = 'none';
+    this.zone.style.opacity = '0';
     window.clearTimeout(this.fadeTimer);
-    void this.clickZone.offsetHeight;
+    void this.zone.offsetHeight;
     this.setZoneOpacity(1, duration);
   }
 
   private setZoneOpacity(opacity: number, duration: number): void {
     const transition = `opacity ${duration}s linear`;
-    this.clickZone.style.transition = transition;
-    this.moveZone.style.transition = transition;
+    this.zone.style.transition = transition;
+    this.hintLabel.style.transition = transition;
     window.clearTimeout(this.fadeTimer);
     requestAnimationFrame(() => {
-      this.clickZone.style.opacity = `${opacity}`;
-      this.moveZone.style.opacity = `${opacity}`;
+      this.zone.style.opacity = `${opacity}`;
+      if (!this.hintHidden) {
+        this.hintLabel.style.opacity = `${opacity}`;
+      }
     });
     this.fadeTimer = window.setTimeout(() => {
-      this.clickZone.style.transition = 'none';
-      this.moveZone.style.transition = 'none';
+      this.zone.style.transition = 'none';
+      this.hintLabel.style.transition = 'none';
     }, duration * 1000);
   }
 
@@ -121,75 +172,85 @@ export class ZoneOverlay {
     const topLeft = this.worldToScreen(this.platLeft, this.platTop);
     const bottomRight = this.worldToScreen(this.platRight, this.platBottom);
 
-    const clickTop = bottomRight.sy + 30;
-    const clickBottom = clickTop + 220;
-    const clickLeft = topLeft.sx;
-    const clickRight = bottomRight.sx;
+    // 合并 zone：从平台底边向上 EXTEND_UP 到向下 EXTEND_DOWN
+    const zoneTop    = bottomRight.sy - ZoneOverlay.EXTEND_UP;
+    const zoneBottom = bottomRight.sy + ZoneOverlay.EXTEND_DOWN;
+    const zoneLeft   = topLeft.sx;
+    const zoneRight  = bottomRight.sx;
 
-    this.clickRect = {
-      left: clickLeft,
-      top: clickTop,
-      width: clickRight - clickLeft,
-      height: clickBottom - clickTop,
+    this.zoneRect = {
+      left: zoneLeft,
+      top: zoneTop,
+      width: zoneRight - zoneLeft,
+      height: zoneBottom - zoneTop,
     };
 
-    Object.assign(this.clickZone.style, {
-      left: `${this.clickRect.left}px`,
-      top: `${this.clickRect.top}px`,
-      width: `${this.clickRect.width}px`,
-      height: `${this.clickRect.height}px`,
+    Object.assign(this.zone.style, {
+      left: `${this.zoneRect.left}px`,
+      top: `${this.zoneRect.top}px`,
+      width: `${this.zoneRect.width}px`,
+      height: `${this.zoneRect.height}px`,
     });
 
-    const moveBottom = bottomRight.sy;
-    const moveTop = moveBottom - 150;
-
-    this.moveRect = {
-      left: clickLeft,
-      top: moveTop,
-      width: clickRight - clickLeft,
-      height: Math.max(0, moveBottom - moveTop),
-    };
-
-    Object.assign(this.moveZone.style, {
-      left: `${this.moveRect.left}px`,
-      top: `${this.moveRect.top}px`,
-      width: `${this.moveRect.width}px`,
-      height: `${this.moveRect.height}px`,
-    });
+    // 提示文案 & 警告文案：zone 顶部上方，水平居中
+    const hintCenterX = this.zoneRect.left + this.zoneRect.width / 2;
+    const hintTop = `${this.zoneRect.top - 36}px`;
+    if (!this.hintHidden) {
+      Object.assign(this.hintLabel.style, { left: `${hintCenterX}px`, top: hintTop });
+    }
+    Object.assign(this.warningLabel.style, { left: `${hintCenterX}px`, top: hintTop });
   }
 
-  isInClickZone(clientX: number, clientY: number): boolean {
-    const containerRect = this.sceneManager.renderer.domElement.parentElement?.getBoundingClientRect();
-    if (!containerRect) return false;
-    const localX = clientX - containerRect.left;
-    const localY = clientY - containerRect.top;
-    return (
-      localX >= this.moveRect.left &&
-      localX <= this.moveRect.left + this.moveRect.width &&
-      localY >= this.moveRect.top &&
-      localY <= this.moveRect.top + this.moveRect.height
-    );
+  setHintText(text: string): void {
+    this.hintLabel.textContent = text;
+    // hideHint 后不恢复显示
+    if (!this.hintHidden) {
+      this.hintLabel.style.opacity = '1';
+    }
   }
 
-  isInMoveZone(clientX: number, clientY: number): boolean {
-    const containerRect = this.sceneManager.renderer.domElement.parentElement?.getBoundingClientRect();
-    if (!containerRect) return false;
-    const localX = clientX - containerRect.left;
-    const localY = clientY - containerRect.top;
-    return (
-      localX >= this.clickRect.left &&
-      localX <= this.clickRect.left + this.clickRect.width &&
-      localY >= this.clickRect.top &&
-      localY <= this.clickRect.top + this.clickRect.height
-    );
+  hideHint(): void {
+    this.hintHidden = true;
+    // 只移除提示文字标签，区域框保留
+    this.hintLabel.remove();
   }
 
-  getMoveWorldBounds(): { minX: number; maxX: number; minY: number; maxY: number } {
-    return {
-      minX: this.platLeft,
-      maxX: this.platRight,
-      minY: this.sceneManager.wallBounds.minY,
-      maxY: this.platBottom,
-    };
+  isHintVisible(): boolean {
+    return !this.hintHidden && this.hintLabel.isConnected;
+  }
+
+  resetHint(text?: string): void {
+    if (text) this.hintLabel.textContent = text;
+    this.hintHidden = false;
+    if (!this.hintLabel.isConnected) {
+      this.parent.append(this.hintLabel);
+    }
+    this.hintLabel.style.opacity = '1';
+  }
+
+  showWarning(): void {
+    this.warningLabel.textContent = Locale.t('当角色站在影子上时，移动物品会使影子消散', 'Moving objects while characters stand on shadows will cause the shadows to fade');
+    window.clearTimeout(this.warningTimer);
+    this.hintLabel.style.opacity = '0';
+    this.warningLabel.style.transition = 'opacity 0.2s ease';
+    this.warningLabel.style.opacity = '1';
+  }
+
+  hideWarning(): void {
+    this.warningTimer && window.clearTimeout(this.warningTimer);
+    this.warningLabel.style.transition = 'opacity 0.4s ease';
+    this.warningLabel.style.opacity = '0';
+    if (!this.hintHidden) {
+      this.hintLabel.style.transition = 'opacity 0.4s ease';
+      this.hintLabel.style.opacity = '1';
+    }
+    this.warningTimer = window.setTimeout(() => {
+      if (!this.hintHidden) this.hintLabel.style.transition = 'none';
+      this.warningLabel.style.transition = 'none';
+    }, 400);
+  }
+
+  refreshWarningText(): void {
+    this.warningLabel.textContent = Locale.t('当角色站在影子上时，移动物品会使影子消散', 'Moving objects while characters stand on shadows will cause the shadows to fade');
   }
 }

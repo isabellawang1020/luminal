@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
-  publicDir: false,
+  publicDir: 'public',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

@@ -42,7 +42,7 @@ export class SceneManager {
     minX: -8,
     maxX: 8,
     minY: 0.8,
-    maxY: 9.8,
+    maxY: 13.0,
     z: 0,
   };
   public readonly wallMesh: THREE.Mesh;
@@ -59,10 +59,11 @@ export class SceneManager {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = false;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.sortObjects = true;
     this.container.append(this.renderer.domElement);
 
     this.camera.position.set(0, 7.5, 24);
-    this.camera.lookAt(0, 5.5, 3);
+    this.camera.lookAt(0, 6.8, 3);
 
     this.scene.add(new THREE.AmbientLight(0xf7efe2, 1.5));
 
@@ -105,7 +106,7 @@ export class SceneManager {
     this.sill.position.set(0, 0.05, 1.15);
     this.scene.add(this.sill);
 
-    const maskStyle = { position: 'absolute', top: '0', height: '100%', background: '#006994', display: 'none', zIndex: '3', pointerEvents: 'none' } as const;
+    const maskStyle = { position: 'absolute', top: '0', height: '100%', background: 'transparent', display: 'block', zIndex: '3', pointerEvents: 'none' } as const;
 
     this.leftMask = document.createElement('div');
     Object.assign(this.leftMask.style, { ...maskStyle, left: '0', width: '0' });
@@ -163,23 +164,22 @@ export class SceneManager {
     this.scene.remove(this.wallMesh, this.wallFrame, this.sill);
   }
 
-  setClipping(enabled: boolean): void {
-    if (enabled) {
-      this.updateMaskPositions();
-      this.leftMask.style.display = 'block';
-      this.rightMask.style.display = 'block';
-    } else {
-      this.leftMask.style.display = 'none';
-      this.rightMask.style.display = 'none';
-    }
+  setClipping(_enabled: boolean): void {
+    // 遮罩常驻，无需动态切换
   }
 
   private updateMaskPositions(): void {
     const leftEdge = this.worldToScreen(new THREE.Vector3(this.wallBounds.minX, 5, this.wallBounds.z));
     const rightEdge = this.worldToScreen(new THREE.Vector3(this.wallBounds.maxX, 5, this.wallBounds.z));
     const containerWidth = this.container.clientWidth;
-    this.leftMask.style.width = `${Math.max(0, leftEdge.x)}px`;
-    this.rightMask.style.width = `${Math.max(0, containerWidth - rightEdge.x)}px`;
+    const leftW = Math.max(0, leftEdge.x);
+    const rightW = Math.max(0, containerWidth - rightEdge.x);
+    this.leftMask.style.width = `${leftW}px`;
+    this.rightMask.style.width = `${rightW}px`;
+    // 用 clip-path 裁剪 canvas，只显示 wallBounds 范围内的内容
+    const l = leftW;
+    const r = containerWidth - rightW;
+    this.renderer.domElement.style.clipPath = `inset(0 ${containerWidth - r}px 0 ${l}px)`;
   }
 
   render(): void {
