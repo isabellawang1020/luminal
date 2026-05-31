@@ -38,8 +38,8 @@ export const tutorial3: LevelConfig = {
   walkerSelectedHintText: '点选门扉，引导角色前往终点',
   walkerSelectedHintTextEn: 'Click the gate — guide them to the end',
   hintArea: { x: 0, y: 10.35, width: 3.25, height: 1.05 },
-  hintText: '向上移动，让影子铺出第一道光路',
-  hintTextEn: 'Lift upward, and let shadows lay the first beam of light',
+  hintText: '向上移动积木，让影子铺出第一道光路',
+  hintTextEn: 'Lift the block upward, and let its shadow form the first path of light',
   walkerSheet: {
     url: '/textures/baby_sheet.png',
     frameCount: 4,

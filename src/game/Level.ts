@@ -133,6 +133,11 @@ export interface LevelConfig {
    */
   partyMergeChase?: boolean;
   /**
+   * 是否让主组也主动跑向额外组（双向追击，比单向更快）
+   * 仅在 partyMergeChase=true 时生效
+   */
+  partyMergeBidirectional?: boolean;
+  /**
    * 影子连通后自动通关序列：所有角色被自动控制走向门 + 触发剧情回调（变身/淡出 etc）
    * 实现层：onBridgeConnected 回调里 main.ts 监听并启动序列
    */
@@ -1204,13 +1209,15 @@ export class Level {
     // 墙缓冲：避免角色贴墙时半身进墙
     const clippedPath = this.clipPathByWallBuffer(worldPath);
     if (this.partyMerged) {
-      // 合并后：所有跟随者复制主角完整 path，一直走到门口附近。
-      // 不再用 shortenPathEnd 缩短 path（否则会停在主角身后 offset 处，永远不到门）。
       for (const entry of this.partyOffsets) {
         const target = entry.getWalker();
         if (!target) continue;
         const wInst = target instanceof Walker ? target : (target as Companion).walker;
-        wInst.setPath(clippedPath.map((p) => p.clone()));
+        wInst.setPath(clippedPath.map((p) => p.clone()), () => {
+          if (this.gate.isReached(wInst.position)) {
+            this.tryCompleteLevel();
+          }
+        });
       }
     } else {
       // 未合并：当前组的 companion 直接复制路径
@@ -1403,7 +1410,17 @@ export class Level {
         const cond = this.config.partyMergeCondition ?? 'wall-removed';
         let conditionMet = false;
         if (cond === 'wall-removed') {
-          conditionMet = this.walls.length === 0 || this.walls.every((w) => w.removed);
+          const wallsRemoved = this.walls.length === 0 || this.walls.every((w) => w.removed);
+          conditionMet = wallsRemoved;
+          // 如果配置了 partyMergePlatformY，额外要求所有组都在该平台 Y 位置
+          if (conditionMet && this.config.partyMergePlatformY !== undefined) {
+            const targetY = this.config.partyMergePlatformY;
+            const yTol = 0.5;
+            const mainOnPlatform = Math.abs(this.walker.position.y - targetY) < yTol;
+            const allExtraOnPlatform = this.extraGroups.every((g) =>
+              Math.abs(g.walker.position.y - targetY) < yTol);
+            conditionMet = conditionMet && mainOnPlatform && allExtraOnPlatform;
+          }
         } else if (cond === 'bridge-connected-same-platform') {
           // 影子已连通 + 所有墙已移除 + 主组主角和所有 extra 组主角都在同一指定 Y 平台
           const targetY = this.config.partyMergePlatformY ?? 0;
@@ -1418,20 +1435,31 @@ export class Level {
 
         if (conditionMet) {
           if (this.config.partyMergeChase) {
-            // 让 extra 组主动跑向主组主角；到达后 mergeParty
+            // extra 主动跑向主组；如果配置了双向追击，主组也跑向 extra
             const main = this.walker.position;
             let allArrived = true;
             for (const g of this.extraGroups) {
               const d = Math.hypot(main.x - g.walker.position.x, main.y - g.walker.position.y);
               if (d < Level.MERGE_THRESHOLD) continue;
               allArrived = false;
-              // 还没到 → 让该 extra walker 跑向主组主角（沿同 Y 直线，假设同平台）
+              // extra 跑向主组的 X 方向，保持在自身 Y 坐标
+              // （如果两者平台 Y 不同，主组应通过 ramp 走到同一平台）
               const targetX = main.x;
-              // 用快速 BFS 路径（如果有阶梯就走阶梯）；先用简单"沿 X 直线"实现，要更稳可改 findPathForFollower
-              g.walker.setPath([new THREE.Vector2(targetX, main.y)]);
-              // 同时狗（companion）也跟主角直走
+              const targetY = g.walker.position.y;
+              g.walker.setPath([new THREE.Vector2(targetX, targetY)]);
               if (g.companion) {
-                g.companion.followPath([new THREE.Vector2(targetX - 0.5, main.y)]);
+                g.companion.followPath([new THREE.Vector2(targetX - 0.5, targetY)]);
+              }
+              // 双向追击：主组主动向 extra 靠近（主在上方平台时，主会沿 ramp 走下来）
+              // 仅当主组不在移动中（未被玩家操控）时才触发
+              if (this.config.partyMergeBidirectional
+                && !this.isWalkerMoveLocked
+                && !this.walker.isWalking()) {
+                const mainTargetX = g.walker.position.x;
+                this.walker.setPath([new THREE.Vector2(mainTargetX, g.walker.position.y)]);
+                if (this.companion) {
+                  this.companion.followPath([new THREE.Vector2(mainTargetX - 0.5, g.walker.position.y)]);
+                }
               }
             }
             if (allArrived) {

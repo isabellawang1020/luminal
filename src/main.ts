@@ -199,12 +199,12 @@ function runChapter6Sequence(level: import('@/game/Level').Level): void {
 const bindLevelCallbacks = (level: import('@/game/Level').Level) => {
   level.onWalkerFell = () => zoneOverlay.showWarning();
   level.onRestart = () => { zoneOverlay.hideWarning(); walkerArrowTracking = false; gateArrowTracking = false; };
-  // 切换到新关卡时重置并更新提示文案
-  const initialText = level.setHintText(
-    level.config.hintText ?? '向上移动，让影子铺出第一道光路',
-    level.config.hintTextEn ?? 'Lift upward, and let shadows lay the first beam of light',
+  // 切换关卡时先把提示词写入 level（onLevelActivated 时再显示，
+  // 避免延迟过渡提前创建下一关时提示词闪现）
+  level.setHintText(
+    level.config.hintText ?? '向上移动积木，让影子铺出第一道光路',
+    level.config.hintTextEn ?? 'Lift the block upward, and let its shadow form the first path of light',
   );
-  zoneOverlay.resetHint(initialText);
 
 
 
@@ -246,6 +246,15 @@ const bindLevelCallbacks = (level: import('@/game/Level').Level) => {
       6: '/video/chapter4end.mp4', // 4-2 通关后 → chapter4end → 第五章叙事
       8: '/video/chapter5end.mp4', // 5-2 通关后 → chapter5end → 第六章叙事
       9: '/video/chapter6end.mp4', // 6-1 通关后 → chapter6end → 结束叙事
+    };
+    // 关卡索引 → 视频开始播放时淡入的下一章 BGM（视频期间完成 crossfade）
+    const nextBgmMap: Record<number, string> = {
+      1: 'BGM-02',   // 1-2 通关后 → chapter1end2 视频期间 → BGM-02
+      2: 'BGM-03',   // 2-1 通关后 → chapter2end 视频期间 → BGM-03
+      4: 'BGM-04',   // 3-2 通关后 → chapter3end 视频期间 → BGM-04
+      6: 'BGM-05',   // 4-2 通关后 → chapter4end 视频期间 → BGM-05
+      8: 'BGM-06',   // 5-2 通关后 → chapter5end 视频期间 → BGM-06
+      9: 'BGM-06',   // 6-1 通关后（终章）保持 BGM-06 作为结束叙事音乐
     };
     const narrative = narrativeMap[chapterManager.currentLevelIndex];
     if (!narrative) return;
@@ -292,6 +301,12 @@ const bindLevelCallbacks = (level: import('@/game/Level').Level) => {
       // 播放顺序：视频 → 叙事 → 过渡
       // 如果有视频就先播放视频，视频结束后显示叙事；否则直接显示叙事
       if (preVideo) {
+        // 视频开始播放时淡入下一章 BGM（同时淡出当前 BGM），与视频 3s 淡入同步完成
+        const nextBgm = nextBgmMap[chapterManager.currentLevelIndex];
+        if (nextBgm) {
+          bgm.setVolumeMultiplier(0.3, 0.6);
+          bgm.crossfadeTo(nextBgm, 3.0);
+        }
         // 章节结束视频标准淡入时长：3s
         videoScreen.show(preVideo, showNarrative, 3000);
       } else {
@@ -336,11 +351,11 @@ const bindLevelCallbacks = (level: import('@/game/Level').Level) => {
         for (let i = 1; i < plats.length - 1; i += 1) {
           const p = plats[i];
           if (pos.x >= p.x - p.width / 2 && pos.x <= p.x + p.width / 2) {
-            // 空串表示"全程不切换提示词"，保留原有文案
-            if (level.config.transitHintText !== '') {
+            // 空串或 undefined 表示"全程不切换提示词"，保留原有文案
+            if (level.config.transitHintText) {
               const text = level.setHintText(
-                level.config.transitHintText ?? '点击行李箱，可再次移动他的位置',
-                level.config.transitHintTextEn ?? 'Click the suitcase to move it again',
+                level.config.transitHintText ?? '再次移动行李箱，铺出下一段路',
+                level.config.transitHintTextEn ?? 'Move the suitcase again to make the next path',
               );
               zoneOverlay.resetHint(text);
             }
@@ -456,6 +471,14 @@ function getBgmForLevel(levelIndex: number): string {
 // 后续关卡切换时自动绑
 chapterManager.onLevelCreated = bindLevelCallbacks;
 chapterManager.onLevelActivated = (index) => {
+  // 关卡激活时显示提示词（此时关卡已切换完成，不会提前闪现）
+  const activeLevel = chapterManager.activeLevel;
+  // 每次重新设置提示词（刷新 Locale 对应的翻译版本，防御 currentHint 过期）
+  const displayHint = activeLevel.setHintText(
+    activeLevel.config.hintText ?? '向上移动积木，让影子铺出第一道光路',
+    activeLevel.config.hintTextEn ?? 'Lift the block upward, and let its shadow form the first path of light',
+  );
+  zoneOverlay.resetHint(displayHint);
   setBackground(index);
   hud.setLevelLabel(getLevelDisplayLabel(index));
   // 切换 BGM 到当前章节
@@ -482,7 +505,7 @@ Object.assign(debugPanel.style, {
   fontSize: '12px',
   lineHeight: '1.7',
   pointerEvents: 'auto',
-  display: 'block',
+  display: 'none',
   zIndex: '9999',
   minWidth: '200px',
   whiteSpace: 'pre',
@@ -784,47 +807,49 @@ const videoScreen = new VideoScreen(overlayLayer);
 
 // 第一章开篇文字
 const chapter1Narrative = [
-  { zh: '你睁开眼，看见的第一件事——是光。', en: 'The first thing you ever saw was light.' },
+  { zh: '你睁开眼，第一眼看见的是光。', en: 'When you opened your eyes, the first thing you saw was light.' },
 ];
 
 // 第二章开篇文字
 const chapter2Narrative = [
   { zh: '你学会了走路。', en: 'You learned to walk.' },
-  { zh: '影子，也学会了陪伴。', en: 'And your shadow learned to stay.' },
+  { zh: '影子，也开始学着陪伴。', en: 'And your shadow learned to stay beside you.' },
 ];
 
 // 第三章开篇文字
 const chapter3Narrative = [
-  { zh: '有天你忽然好奇：光，究竟从哪里来？', en: 'One day, you wondered: where does light truly come from?' },
-  { zh: '也是那一天，路上多了一个同路人。', en: 'That very day, someone joined you on the road.' },
+  { zh: '有一天，你忽然想知道：光，究竟从哪里来？', en: 'One day, you began to wonder: where does light truly come from?' },
+  { zh: '也是那一天，路上多了一个同行者。', en: 'That same day, someone began walking beside you.' },
 ];
 
 // 第四章开篇文字
 const chapter4Narrative = [
-  { zh: '你背上行囊，走进了更大的世界。', en: 'You packed your burdens, and stepped into a wider world.' },
-  { zh: '光在远方，你在身旁，中间是一段漫长却美丽的路。', en: 'Light far away, you here beside me — and in between, a long but beautiful road.' },
+  { zh: '你背起行囊，走进更大的世界。', en: 'You shouldered your luggage and stepped into a wider world.' },
+  { zh: '光在远方，你在此处，中间是一段漫长却美丽的路。', en: 'Light was far ahead. You stood here. Between them lay a long, beautiful road.' },
 ];
 
 // 第五章开篇文字
 const chapter5Narrative = [
   { zh: '你曾以为，拥有就会害怕失去。', en: 'You once thought having meant fearing loss.' },
-  { zh: '后来才懂，最暖的光，不在照亮远方，而在照亮回家的路。', en: "Only later did you learn: the warmest light doesn't shine far away — it lights the way home." },
+  { zh: '后来才懂，最暖的光，不是照向远方，而是照亮回家的路。', en: 'Only later did you learn: the warmest light is not the one that shines far away, but the one that lights the way home.' },
 ];
 
 // 第六章开篇文字（5-2 通关后，进入终章 6-1）
 const chapter6Narrative = [
   { zh: '原来路再远，只要有人同行，就不算长。', en: 'It turned out no road is too long, as long as someone walks with you.' },
-  { zh: '我们成了彼此的灯塔。', en: "We became each other's beacon." },
-  { zh: '但光走得越快，影子也拉得越长。', en: 'But the faster light travels, the longer shadows stretch.' },
+  { zh: '后来，我们成了彼此的灯。', en: "In time, we became each other's light." },
+  { zh: '可光越往前，影子也被拉得越长。', en: 'But as the light moved on, the shadows grew longer.' },
 ];
 
 // 终章结束语（6-1 通关后）
 const endingNarrative = [
-  { zh: '你来时，世界递给你一束光。', en: 'When you arrived, the world handed you a beam of light.' },
+  { zh: '你来时，世界把一束光交到你手里。', en: 'When you arrived, the world placed a beam of light in your hands.' },
   { zh: '你离开时，把它还给了每一个你爱过的人。', en: 'When you left, you gave it back to everyone you ever loved.' },
-  { zh: '光不会消失，只是换了地方，继续温柔地照亮。', en: 'Light never fades — it simply moves, and keeps softly shining.' },
+  { zh: '光不会消失，它只是换了地方，继续温柔地照着。', en: 'Light never disappears. It simply moves somewhere else, and keeps shining softly.' },
   { zh: '', en: '' }, // 空行
-  { zh: '谢谢你，陪我们走完这段旅程。', en: 'Thank you for walking this journey with us.' },
+  { zh: '', en: '' }, // 额外空行 1
+  { zh: '', en: '' }, // 额外空行 2
+  { zh: '谢谢你，陪他走完这一生。', en: 'Thank you for walking this life with him.' },
 ];
 
 
@@ -839,8 +864,8 @@ let gameStarted = false;
 function startGame(): void {
   if (gameStarted) return;
   gameStarted = true;
-  // 开始页 BGM-00 降到 30%（视频/叙事过渡）
-  bgm.setVolumeMultiplier(0.3, 0.6);
+  // 点击开始：BGM-00 淡出，同时淡入 BGM-01（视频期间播放）
+  bgm.crossfadeTo('BGM-01', 1.0);
 
   // 关卡画面 → 渐黑过渡（0.5s 淡出 + 0.3s 纯黑停顿）
   overlayLayer.style.transition = 'opacity 0.5s ease-out';
@@ -858,9 +883,6 @@ function startGame(): void {
     sceneLayer.style.opacity = '1';
     zoneLayer.style.opacity = '1';
     uiLayer.style.opacity = '1';
-    // 切到第一章 BGM-01（同时音量恢复）
-    bgm.setVolumeMultiplier(1.0, 0.8);
-    bgm.crossfadeTo('BGM-01', 1.2);
     chapterManager.activeLevel.resume();
     controls.notifyGameStarted();
   };

@@ -135,11 +135,12 @@ export const chapter5Level1: LevelConfig = {
   requireAllWalkersAtGate: true, // 两组角色都到门才通关
   allowPartyMerge: true, // 墙移除后两组相遇可合并为一队
   partyOrder: ['extra-walker-0', 'main-walker', 'extra-companion-0', 'main-companion'], // 女、男、猫、狗
+  partyMergePlatformY: 7.425, // 触发追击的平台 Y 坐标
+  partyMergeChase: true, // 启用主动追击
+  partyMergeBidirectional: true, // 双向追击，主动靠近
   hintArea: { x: 0, y: 7.35, width: 3.25, height: 1.05 },
-  hintText: '裂缝之处，光自会渗入',
-  hintTextEn: 'Where light breaks through — where life begins anew',
-  wallRemovedHintText: '每个人都是光的一部分，少了谁，光路都不完整',
-  wallRemovedHintTextEn: 'Each of us is a piece of the light — without one, the path is incomplete',
+  hintText: '每个人都是光的一部分，少了谁，这条路都不完整',
+  hintTextEn: 'Each of us carries a part of the light. Without one, the path is incomplete.',
   transitHintText: '',
   transitHintTextEn: '',
   persistentHint: true,

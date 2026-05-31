@@ -68,7 +68,7 @@ export class HUD {
       boxShadow: '0 4px 14px rgba(85,64,40,0.10)',
       letterSpacing: '0.04em',
     });
-    this.bgmButton.textContent = Locale.current === 'zh' ? '🔊 BGM: 开' : '🔊 BGM: On';
+    this.bgmButton.textContent = Locale.current === 'zh' ? '🔊 音乐：开' : '🔊 Music: On';
     this.bgmButton.addEventListener('click', () => this.toggleBgm());
     this.bgmButton.addEventListener('pointerenter', () => {
       this.bgmButton.style.background = '#0a4a6e';
@@ -173,16 +173,16 @@ export class HUD {
   private toggleBgm(): void {
     this.bgmMuted = !this.bgmMuted;
     this.bgmButton.textContent = this.bgmMuted
-      ? (Locale.current === 'zh' ? '🔇 BGM: 关' : '🔇 BGM: Off')
-      : (Locale.current === 'zh' ? '🔊 BGM: 开' : '🔊 BGM: On');
+      ? (Locale.current === 'zh' ? '🔇 音乐：关' : '🔇 Music: Off')
+      : (Locale.current === 'zh' ? '🔊 音乐：开' : '🔊 Music: On');
     this.onBgmToggle?.(this.bgmMuted);
   }
 
   /** 语言切换时刷新动态显示的文本（BGM 按钮状态、暂停面板） */
   refreshLocalizedText(): void {
     this.bgmButton.textContent = this.bgmMuted
-      ? (Locale.current === 'zh' ? '🔇 BGM: 关' : '🔇 BGM: Off')
-      : (Locale.current === 'zh' ? '🔊 BGM: 开' : '🔊 BGM: On');
+      ? (Locale.current === 'zh' ? '🔇 音乐：关' : '🔇 Music: Off')
+      : (Locale.current === 'zh' ? '🔊 音乐：开' : '🔊 Music: On');
     if (this.pausePanel.style.display === 'flex') {
       this.renderPausePanel();
     }
@@ -215,7 +215,7 @@ export class HUD {
     this.pausePanel.innerHTML = `
       <div style="pointer-events:auto; min-width:300px; padding:28px 30px; border-radius:24px; background:rgba(255,248,238,0.92); box-shadow:0 20px 50px rgba(64,43,21,0.16); text-align:center;">
         <div style="font-size:28px; margin-bottom:8px;">${Locale.t('已暂停', 'Paused')}</div>
-        <div style="font-size:14px; color:#6e6054; margin-bottom:18px;">${Locale.t('按 Esc 重新开始，或点选继续', 'Press Esc to restart, or click to continue')}</div>
+        <div style="font-size:14px; color:#6e6054; margin-bottom:18px;">${Locale.t('按 Esc 重新开始，或继续旅程', 'Press Esc to restart, or continue the journey')}</div>
         <button data-action="resume" style="border:none; background:#6f60f4; color:#fff; padding:10px 18px; border-radius:999px; cursor:pointer; font-size:14px;">${Locale.t('继续', 'Continue')}</button>
       </div>
     `;
@@ -242,13 +242,13 @@ export class HUD {
   }
 
   showHintMessage(): void {
-    this.showToast(Locale.t('提示：让影子铺上中央缺口', 'Hint: fill the central gap with shadows'));
+    this.showToast(Locale.t('提示：让影子填上中间的空隙', 'Hint: let the shadow fill the gap in the middle'));
   }
 
   showComplete(): void {
-    this.centerMessage.textContent = 'Level Complete';
+    this.centerMessage.textContent = Locale.t('光路已启', 'The path of light is open');
     this.centerMessage.style.opacity = '1';
-    this.subMessage.textContent = Locale.t('光路已通，影之人抵达终点', 'The path of light is open — the shadow-walker has arrived');
+    this.subMessage.textContent = Locale.t('旅人已抵达', 'The traveler has arrived');
     this.subMessage.style.opacity = '1';
   }
 

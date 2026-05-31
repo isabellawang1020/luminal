@@ -39,9 +39,11 @@ export const chapter3Level1: LevelConfig = {
   bridgeTolerance: 0.2,
   noGuide: true,
   multiBridge: true,
+  transitHintText: '再次移动行李箱，铺出下一段路',
+  transitHintTextEn: 'Move the suitcase again to make the next path',
   hintArea: { x: 0, y: 10.35, width: 3.25, height: 1.05 },
-  hintText: '长路漫漫，先迈出第一步',
-  hintTextEn: 'A long road awaits — take the first step',
+  hintText: '路还很长，先让影子抵达下一站',
+  hintTextEn: 'The road is long. Let the shadow reach the next stop first.',
   walkerSheet: {
     url: '/textures/young_sheet.png',
     frameCount: 2,

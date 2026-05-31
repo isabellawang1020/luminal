@@ -64,7 +64,7 @@ export class ObjectControls {
     });
     this.root.append(this.panel);
 
-    const { pad: rotatePad, btns: rotateBtns } = this.buildCrosspadWithRefs('旋转', 'Rotate', '#6f60f4', 'rgba(111, 96, 244, 0.88)', {
+    const { pad: rotatePad, btns: rotateBtns } = this.buildCrosspadWithRefs('转动', 'Rotate', '#6f60f4', 'rgba(111, 96, 244, 0.88)', {
       up: () => this.callbacks.onRotateZ(ROTATION_STEP),    // 顺时针
       down: () => this.callbacks.onRotateZ(-ROTATION_STEP), // 逆时针
       left: () => this.callbacks.onRotateY(ROTATION_STEP),

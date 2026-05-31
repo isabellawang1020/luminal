@@ -32,8 +32,8 @@ export const chapter2Level1: LevelConfig = {
   bridgeTolerance: 0.1,
   noGuide: true,
   hintArea: { x: 0, y: 10.35, width: 3.25, height: 1.05 },
-  hintText: '换个角度，光影自会引路',
-  hintTextEn: 'A new angle — light and shadow will guide you',
+  hintText: '换个角度，影子会找到路',
+  hintTextEn: 'Try another angle. The shadow will find a way.',
   persistentHint: true,
   walkerSheet: {
     url: '/textures/boy_sheet.png',

@@ -104,8 +104,8 @@ export const chapter6Level1: LevelConfig = {
   noGuide: true,
   multiBridge: true,
   hintArea: { x: 0, y: 9.5, width: 4, height: 1.0 },
-  hintText: '让影子，轻轻覆盖时光的缝隙',
-  hintTextEn: 'Let shadows gently fill the cracks of time',
+  hintText: '让影子，轻轻填上时光的缝隙',
+  hintTextEn: 'Let the shadow gently fill the cracks of time',
   persistentHint: true,
   // 6-1 慢节奏剧情，角色走得慢一点
   walkerSpeed: 2.0,

@@ -32,8 +32,8 @@ export const chapter1Level2: LevelConfig = {
   lockWalkerUntilBridge: true,
   tutorialRotateSteps: 4,
   hintArea: { x: 0, y: 10.35, width: 3.25, height: 1.05 },
-  hintText: '旋转吧，让影子跨越那道空隙',
-  hintTextEn: 'Turn it — let the shadow bridge the gap',
+  hintText: '旋转奶瓶，让影子跨过那道空隙',
+  hintTextEn: 'Turn the bottle, and let its shadow bridge the gap',
   walkerSheet: {
     url: '/textures/baby_sheet.png',
     frameCount: 4,

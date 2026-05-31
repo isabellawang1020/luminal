@@ -110,6 +110,21 @@ export class BgmManager {
     this.fadeTo(targetMul * this.masterVolume, durationSec, audio);
   }
 
+  /**
+   * 淡出当前 BGM（不切换到新曲目）
+   * @param durationSec 淡出时长（秒）
+   */
+  fadeOut(durationSec: number = 1.0): void {
+    const audio = this.currentId ? this.audios.get(this.currentId) ?? null : null;
+    if (!audio) return;
+
+    this.startFade(audio, null, 0, durationSec);
+    // 淡出完成后清除 currentId，避免后续操作干扰
+    setTimeout(() => {
+      this.currentId = null;
+    }, durationSec * 1000);
+  }
+
   /** 仅渐变当前音轨到指定音量 */
   private fadeTo(targetVol: number, durationSec: number, audio?: HTMLAudioElement | null): void {
     const target = audio ?? (this.currentId ? this.audios.get(this.currentId) ?? null : null);

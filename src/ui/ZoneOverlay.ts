@@ -57,7 +57,7 @@ export class ZoneOverlay {
     parent.append(this.zone);
 
     this.hintLabel = document.createElement('div');
-    this.hintLabel.textContent = config.hintText ?? Locale.t('向上移动，让影子铺出第一道光路', 'Lift upward, and let shadows lay the first beam of light');
+    this.hintLabel.textContent = config.hintText ?? Locale.t('向上移动积木，让影子铺出第一道光路', 'Lift the block upward, and let its shadow form the first path of light');
     Object.assign(this.hintLabel.style, {
       position: 'absolute',
       fontSize: '24px',
@@ -93,7 +93,7 @@ export class ZoneOverlay {
     }).observe(this.hintLabel, { attributes: true, attributeFilter: ['style'] });
 
     this.warningLabel = document.createElement('div');
-    this.warningLabel.textContent = Locale.t('当角色站在影子上时，移动物品会使影子消散', 'Moving objects while characters stand on shadows will cause the shadows to fade');
+    this.warningLabel.textContent = Locale.t('角色正站在影子上，移动物品会让道路消散', 'A character is standing on a shadow. Moving the object will make the path fade.');
     Object.assign(this.warningLabel.style, {
       position: 'absolute',
       fontSize: '13px',
@@ -229,7 +229,7 @@ export class ZoneOverlay {
   }
 
   showWarning(): void {
-    this.warningLabel.textContent = Locale.t('当角色站在影子上时，移动物品会使影子消散', 'Moving objects while characters stand on shadows will cause the shadows to fade');
+    this.warningLabel.textContent = Locale.t('角色正站在影子上，移动物品会让道路消散', 'A character is standing on a shadow. Moving the object will make the path fade.');
     window.clearTimeout(this.warningTimer);
     this.hintLabel.style.opacity = '0';
     this.warningLabel.style.transition = 'opacity 0.2s ease';
@@ -251,6 +251,6 @@ export class ZoneOverlay {
   }
 
   refreshWarningText(): void {
-    this.warningLabel.textContent = Locale.t('当角色站在影子上时，移动物品会使影子消散', 'Moving objects while characters stand on shadows will cause the shadows to fade');
+    this.warningLabel.textContent = Locale.t('角色正站在影子上，移动物品会让道路消散', 'A character is standing on a shadow. Moving the object will make the path fade.');
   }
 }

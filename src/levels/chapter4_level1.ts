@@ -82,8 +82,8 @@ export const chapter4Level1: LevelConfig = {
   noGuide: true,
   multiBridge: true,
   hintArea: { x: 0, y: 7.35, width: 3.25, height: 1.05 },
-  hintText: '看似遥远，路上却总有微光守护',
-  hintTextEn: 'Seems far away, but soft light guards the way',
+  hintText: '看似遥远，也会有微光在路上等你',
+  hintTextEn: 'It may seem far away, but a soft light waits along the way',
   transitHintText: '', // 全程不切换提示词
   transitHintTextEn: '',
   persistentHint: true, // 关卡全程提示词不消失

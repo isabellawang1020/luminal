@@ -220,7 +220,7 @@ export const chapter5Level2: LevelConfig = {
   // 合并后队列：女、男、猫、狗
   partyOrder: ['main-walker', 'main-companion', 'extra-walker-0', 'extra-companion-0'],
   hintArea: { x: 0, y: 11.5, width: 4, height: 1.0 },
-  hintText: '前路未知，但心中有光，便不会迷失方向',
-  hintTextEn: 'The road ahead is unknown, but those who carry light within never lose their way',
+  hintText: '前路未知，但心里有光，就不会真正迷路',
+  hintTextEn: 'The road ahead is unknown. But with light within, you are never truly lost.',
   persistentHint: true,
 };

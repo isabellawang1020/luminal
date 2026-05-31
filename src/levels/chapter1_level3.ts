@@ -29,8 +29,8 @@ export const chapter1Level3: LevelConfig = {
     },
   ],
   hintArea: { x: 0, y: 7.35, width: 3.25, height: 1.05 },
-  hintText: '移动与旋转，影子会为你铺路',
-  hintTextEn: 'Move and turn — the shadow will pave your way',
+  hintText: '移动推车，再转动它，让影子为你铺路',
+  hintTextEn: 'Move the stroller, then turn it, and let its shadow make the way',
   walkerSheet: {
     url: '/textures/baby_sheet.png',
     frameCount: 4,
