@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 // 5-1：双角色 + 黑色墙障碍 + 双机关协作
 // 玩家先用左下平台机关解锁隐藏通路 → 上左上平台触发墙移除机关 → 墙爆炸
@@ -46,11 +47,11 @@ export const chapter5Level1: LevelConfig = {
     },
   ],
   // 门在右侧平台中央，初始可见（无需 gateInitialHidden）
-  gate: { x: 6.5, y: 8.5, textureUrl: '/textures/gate_new.png', displayHeight: 4.125 },
+  gate: { x: 6.5, y: 8.5, textureUrl: a('/textures/gate_new.png'), displayHeight: 4.125 },
   // 主角色组：adult + 狗，站在左下平台
   walkerStart: { x: -6.0, y: 7.425 },
   walkerSheet: {
-    url: '/textures/adult_sheet.png',
+    url: a('/textures/adult_sheet.png'),
     frameCount: 2,
     frameW: 1100,
     frameH: 2000,
@@ -60,7 +61,7 @@ export const chapter5Level1: LevelConfig = {
   companion: {
     start: { x: -5.5, y: 7.425 },
     sheet: {
-      url: '/textures/dog_sheet.png',
+      url: a('/textures/dog_sheet.png'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -77,7 +78,7 @@ export const chapter5Level1: LevelConfig = {
     {
       start: { x: -5.2, y: 7.425 },
       sheet: {
-        url: '/textures/wife_sheet.png',
+        url: a('/textures/wife_sheet.png'),
         frameCount: 2,
         frameW: 1200,
         frameH: 2100,
@@ -88,7 +89,7 @@ export const chapter5Level1: LevelConfig = {
       companion: {
         start: { x: -4.7, y: 7.425 },
         sheet: {
-          url: '/textures/cat_sheet.png',
+          url: a('/textures/cat_sheet.png'),
           frameCount: 2,
           frameW: 2000,
           frameH: 1400,
@@ -117,7 +118,7 @@ export const chapter5Level1: LevelConfig = {
       initialYOffset: 0.08,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 12, down: 8, left: 6, right: 6 },
-      modelUrl: '/models/cake.glb',
+      modelUrl: a('/models/cake.glb'),
       modelScale: 1.75,
       projectionScale: 3.72,
       useGlbProjection: true,

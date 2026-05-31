@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import type { WalkerSheet } from '@/game/Level';
 import { IdleIndicator } from '@/game/IdleIndicator';
+import { a } from '@/utils/asset';
 
 const DEFAULT_SHEET: WalkerSheet = {
-  url: '/textures/walker_sheet.png',
+  url: a('/textures/walker_sheet.png'),
   frameCount: 5,
   frameW: 128,
   frameH: 256,

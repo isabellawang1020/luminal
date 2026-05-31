@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 // 4-2：两组角色（男+狗 / 女+猫），各自在不同平台
 // 中间平台上有门 + 两个机关，两边各有一组人物
@@ -12,7 +13,7 @@ export const chapter4Level2: LevelConfig = {
     { id: 'right-platform',  x:  6.5, y:  7.25, width: 2.5, height: 0.35 },
   ],
   // 门初始隐藏，两个机关同时绿色时才出现
-  gate: { x: 0, y: 9.45, textureUrl: '/textures/gate_new.png', displayHeight: 3.12 },
+  gate: { x: 0, y: 9.45, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
   gateInitialHidden: true,
   // 两个机关（continuous 模式：仅在角色站在上面时变绿，离开变回橙色）
   buttons: [
@@ -22,7 +23,7 @@ export const chapter4Level2: LevelConfig = {
   // 主角色组：男 young + 狗，位于左平台
   walkerStart: { x: -6.5, y: 11.125 },
   walkerSheet: {
-    url: '/textures/young_sheet.png',
+    url: a('/textures/young_sheet.png'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,
@@ -32,7 +33,7 @@ export const chapter4Level2: LevelConfig = {
   companion: {
     start: { x: -6.0, y: 11.125 },
     sheet: {
-      url: '/textures/dog_sheet.png',
+      url: a('/textures/dog_sheet.png'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -49,7 +50,7 @@ export const chapter4Level2: LevelConfig = {
     {
       start: { x: 6.5, y: 7.425 },
       sheet: {
-        url: '/textures/wife_sheet.png',
+        url: a('/textures/wife_sheet.png'),
         frameCount: 2,
         frameW: 1200,
         frameH: 2100,
@@ -60,7 +61,7 @@ export const chapter4Level2: LevelConfig = {
       companion: {
         start: { x: 6.0, y: 7.425 },
         sheet: {
-          url: '/textures/cat_sheet.png',
+          url: a('/textures/cat_sheet.png'),
           frameCount: 2,
           frameW: 2000,
           frameH: 1400,
@@ -89,7 +90,7 @@ export const chapter4Level2: LevelConfig = {
       initialYOffset: 1.82,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 22, down: 8, left: 4, right: 4 },
-      modelUrl: '/models/telescope.glb',
+      modelUrl: a('/models/telescope.glb'),
       modelScale: 0.87,
       projectionScale: 1.5,
       useGlbProjection: true,
@@ -111,7 +112,7 @@ export const chapter4Level2: LevelConfig = {
       initialYOffset: 0.28,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 12, down: 8, left: 4, right: 4 },
-      modelUrl: '/models/balloon.glb',
+      modelUrl: a('/models/balloon.glb'),
       modelScale: 1.82,
       projectionScale: 3.66,
       useGlbProjection: true,

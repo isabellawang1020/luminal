@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 // 4-1：影子桥 + 隐藏平台机关
 // 玩家用放大镜搭"左→中"的影子桥，过去后走到中平台中央触发按钮
@@ -37,13 +38,13 @@ export const chapter4Level1: LevelConfig = {
     triggerRadius: 0.6,
     visualRadius: 0.22,
   },
-  gate: { x: 6.5, y: 11.95, textureUrl: '/textures/gate_new.png', displayHeight: 3.12 },
+  gate: { x: 6.5, y: 11.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
   walkerStart: { x: -6.95, y: 7.425 },
   // 狗从一开始就跟随主角
   companion: {
     start: { x: -6.0, y: 7.425 }, // 紧跟主角后面
     sheet: {
-      url: '/textures/dog_sheet.png',
+      url: a('/textures/dog_sheet.png'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -69,7 +70,7 @@ export const chapter4Level1: LevelConfig = {
       initialYOffset: 0.3,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 12, down: 8, left: 4, right: 4 },
-      modelUrl: '/models/glass.glb',
+      modelUrl: a('/models/glass.glb'),
       modelScale: 0.2,
       projectionScale: 0.72,
       useGlbProjection: true,
@@ -88,7 +89,7 @@ export const chapter4Level1: LevelConfig = {
   transitHintTextEn: '',
   persistentHint: true, // 关卡全程提示词不消失
   walkerSheet: {
-    url: '/textures/young_sheet.png',
+    url: a('/textures/young_sheet.png'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,

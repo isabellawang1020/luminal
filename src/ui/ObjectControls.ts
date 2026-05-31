@@ -1,6 +1,7 @@
 import type { ShadowObject } from '@/game/ShadowObject';
 import { Locale } from '@/core/Locale';
 import { audioManager } from '@/audio/SfxManager';
+import { a } from '@/utils/asset';
 
 export interface ObjectControlsCallbacks {
   onRotateX: (delta: number) => void;
@@ -70,10 +71,10 @@ export class ObjectControls {
       left: () => this.callbacks.onRotateY(ROTATION_STEP),
       right: () => this.callbacks.onRotateY(-ROTATION_STEP),
     }, {
-      up:    '/textures/ui/rotate_up.png',
-      down:  '/textures/ui/rotate_down.png',
-      left:  '/textures/ui/rotate_left.png',
-      right: '/textures/ui/rotate_right.png',
+      up:    a('/textures/ui/rotate_up.png'),
+      down:  a('/textures/ui/rotate_down.png'),
+      left:  a('/textures/ui/rotate_left.png'),
+      right: a('/textures/ui/rotate_right.png'),
     });
     this.rotateBtns = rotateBtns;
     this.rotationPad = rotatePad;

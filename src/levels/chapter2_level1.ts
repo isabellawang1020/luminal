@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 export const chapter2Level1: LevelConfig = {
   name: '章节 2 - 关卡 1',
@@ -6,7 +7,7 @@ export const chapter2Level1: LevelConfig = {
     { id: 'left-platform', x: -5.2, y: 7.25, width: 5, height: 0.35 },
     { id: 'right-platform', x: 5.2, y: 9.25, width: 5, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 8.95, textureUrl: '/textures/gate_new.png', displayHeight: 3.12 },
+  gate: { x: 6.35, y: 8.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
   walkerStart: { x: -6.45, y: 7.425 },
   objects: [
     {
@@ -22,7 +23,7 @@ export const chapter2Level1: LevelConfig = {
       initialYOffset: 0.76,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 9, down: 8, left: 5, right: 5 },
-      modelUrl: '/models/bear.glb',
+      modelUrl: a('/models/bear.glb'),
       modelScale: 0.83,
       projectionScale: 3.6,
       useGlbProjection: true,
@@ -36,7 +37,7 @@ export const chapter2Level1: LevelConfig = {
   hintTextEn: 'Try another angle. The shadow will find a way.',
   persistentHint: true,
   walkerSheet: {
-    url: '/textures/boy_sheet.png',
+    url: a('/textures/boy_sheet.png'),
     frameCount: 5,
     frameW: 800,
     frameH: 1600,

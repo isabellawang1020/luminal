@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 export const tutorial3: LevelConfig = {
   name: '章节 1 - 关卡 1',
@@ -6,7 +7,7 @@ export const tutorial3: LevelConfig = {
     { id: 'left-platform', x: -4.65, y: 10.25, width: 6.1, height: 0.35 },
     { id: 'right-platform', x: 4.65, y: 10.25, width: 6.1, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 9.95, textureUrl: '/textures/gate_new.png', displayHeight: 2.6 },
+  gate: { x: 6.35, y: 9.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 2.6 },
   walkerStart: { x: -6.45, y: 10.425 },
   objects: [
     {
@@ -22,7 +23,7 @@ export const tutorial3: LevelConfig = {
       initialYOffset: 0.75,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 8, down: 8, left: 0, right: 0 },
-      modelUrl: '/models/1_1_trapezoid.glb',
+      modelUrl: a('/models/1_1_trapezoid.glb'),
       modelScale: 0.65,
       projectionScale: 2.49,
       useGlbProjection: true,
@@ -41,7 +42,7 @@ export const tutorial3: LevelConfig = {
   hintText: '向上移动积木，让影子铺出第一道光路',
   hintTextEn: 'Lift the block upward, and let its shadow form the first path of light',
   walkerSheet: {
-    url: '/textures/baby_sheet.png',
+    url: a('/textures/baby_sheet.png'),
     frameCount: 4,
     frameW: 256,
     frameH: 192,

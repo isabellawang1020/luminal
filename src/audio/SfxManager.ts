@@ -1,6 +1,8 @@
 /**
  * 音效管理器 - 用于播放短促的游戏音效
  */
+import { a } from '@/utils/asset';
+
 export class SfxManager {
   private audioContext: AudioContext | null = null;
   private audioBuffers: Map<string, AudioBuffer> = new Map();
@@ -46,7 +48,7 @@ export class SfxManager {
       if (this.audioBuffers.has(id)) continue;
 
       try {
-        const response = await fetch(`/sound/${id}.m4a`);
+        const response = await fetch(`${a('/sound/')}${id}.m4a`);
         const arrayBuffer = await response.arrayBuffer();
         const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
         this.audioBuffers.set(id, audioBuffer);

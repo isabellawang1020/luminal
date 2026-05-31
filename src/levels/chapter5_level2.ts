@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 // TODO 后续关卡资源约定：
 //   6-1 怀表  → /models/watch.glb
@@ -30,7 +31,7 @@ export const chapter5Level2: LevelConfig = {
     { x: -3, y: 6.5, width: 3.5, height: 4.0 },
   ],
   // 门：再往下一点
-  gate: { x: 6.5, y: 5.825, textureUrl: '/textures/gate_new.png', displayHeight: 4.125 },
+  gate: { x: 6.5, y: 5.825, textureUrl: a('/textures/gate_new.png'), displayHeight: 4.125 },
 
   // ── 按钮：buttons[0]=扳手  buttons[1]=机关1(显示物品)  buttons[2]=机关2(移除墙) ──
   buttons: [
@@ -42,8 +43,8 @@ export const chapter5Level2: LevelConfig = {
       visualRadius: 0.18,
       mode: 'toggle',
       initialToggleState: 'A',
-      imageA: '/ui/righton.png',
-      imageB: '/ui/lefton.png',
+      imageA: a('/ui/righton.png'),
+      imageB: a('/ui/lefton.png'),
       imageWidth: 2.8,
       imageHeight: 1.2,
     },
@@ -114,7 +115,7 @@ export const chapter5Level2: LevelConfig = {
   // 女性在前：朝右走时 wife 在右、young 在左后方（companion 默认 followSide=-1）
   walkerStart: { x: -6.0, y: 10.425 },
   walkerSheet: {
-    url: '/textures/wife_sheet.png',
+    url: a('/textures/wife_sheet.png'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2100,
@@ -124,7 +125,7 @@ export const chapter5Level2: LevelConfig = {
   companion: {
     start: { x: -7.0, y: 10.425 },
     sheet: {
-      url: '/textures/young_sheet.png',
+      url: a('/textures/young_sheet.png'),
       frameCount: 2,
       frameW: 1200,
       frameH: 2000,
@@ -143,7 +144,7 @@ export const chapter5Level2: LevelConfig = {
     {
       start: { x: 5.5, y: 6.425 },
       sheet: {
-        url: '/textures/cat_sheet.png',
+        url: a('/textures/cat_sheet.png'),
         frameCount: 2,
         frameW: 2000,
         frameH: 1400,
@@ -156,7 +157,7 @@ export const chapter5Level2: LevelConfig = {
         // 狗起始位：猫 x=5.5，狗 x=4.5（间距 1.0）
         start: { x: 4.5, y: 6.425 },
         sheet: {
-          url: '/textures/dog_sheet.png',
+          url: a('/textures/dog_sheet.png'),
           frameCount: 2,
           frameW: 1600,
           frameH: 1200,
@@ -192,7 +193,7 @@ export const chapter5Level2: LevelConfig = {
       initialYOffset: -0.3, // railY 之上的 Y 偏移：-0.3 下移 0.3
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 10, down: 6, left: 4, right: 4 },
-      modelUrl: '/models/plant.glb',
+      modelUrl: a('/models/plant.glb'),
       modelScale: 1.8,
       projectionScale: 2.96,
       useGlbProjection: true,

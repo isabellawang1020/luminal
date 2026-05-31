@@ -21,6 +21,7 @@ import { StartScreen } from '@/ui/StartScreen';
 import { VideoScreen } from '@/ui/VideoScreen';
 import { ZoneOverlay } from '@/ui/ZoneOverlay';
 import { Locale } from '@/core/Locale';
+import { a } from '@/utils/asset';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
@@ -54,16 +55,16 @@ zoneLayer.append(bgLayer);
 
 /** 每个关卡索引对应的背景图 URL（undefined 表示无背景） */
 const LEVEL_BACKGROUNDS: (string | undefined)[] = [
-  '/chapter1_bg.jpg', // 1-1
-  '/chapter1_bg.jpg', // 1-2
-  '/chapter2_bg.jpg', // 2-1
-  '/chapter3_bg.jpg', // 3-1
-  '/chapter3_bg.jpg', // 3-2
-  '/chapter5_bg.jpg', // 4-1（与第五章交换）
-  '/chapter5_bg.jpg', // 4-2（与第五章交换）
-  '/chapter4_bg.jpg', // 5-1（与第四章交换）
-  '/chapter4_bg.jpg', // 5-2（暂用第五章背景）
-  '/chapter6_bg.jpg', // 6-1
+  a('/chapter1_bg.jpg'), // 1-1
+  a('/chapter1_bg.jpg'), // 1-2
+  a('/chapter2_bg.jpg'), // 2-1
+  a('/chapter3_bg.jpg'), // 3-1
+  a('/chapter3_bg.jpg'), // 3-2
+  a('/chapter5_bg.jpg'), // 4-1（与第五章交换）
+  a('/chapter5_bg.jpg'), // 4-2（与第五章交换）
+  a('/chapter4_bg.jpg'), // 5-1（与第四章交换）
+  a('/chapter4_bg.jpg'), // 5-2（暂用第五章背景）
+  a('/chapter6_bg.jpg'), // 6-1
 ];
 
 // 关卡索引 → "X-Y" 编号 + 中文章节名（与 levels 数组顺序对应）
@@ -151,7 +152,7 @@ function runChapter6Sequence(level: import('@/game/Level').Level): void {
   }
   // old_sheet 两份（用于女男变老人）—— 同一张 sheet，两个比例
   const oldSheet = {
-    url: '/textures/old_sheet.png',
+    url: a('/textures/old_sheet.png'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,
@@ -240,12 +241,12 @@ const bindLevelCallbacks = (level: import('@/game/Level').Level) => {
     };
     // 关卡索引 → 叙事前播放的视频 URL（可选）
     const preNarrativeVideoMap: Record<number, string> = {
-      1: '/video/chapter1end2.mp4', // 1-2 通关后 → chapter1end2 → 第二章叙事
-      2: '/video/chapter2end.mp4', // 2-1 通关后 → chapter2end → 第三章叙事
-      4: '/video/chapter3end.mp4', // 3-2 通关后 → chapter3end → 第四章叙事
-      6: '/video/chapter4end.mp4', // 4-2 通关后 → chapter4end → 第五章叙事
-      8: '/video/chapter5end.mp4', // 5-2 通关后 → chapter5end → 第六章叙事
-      9: '/video/chapter6end.mp4', // 6-1 通关后 → chapter6end → 结束叙事
+      1: a('/video/chapter1end2.mp4'), // 1-2 通关后 → chapter1end2 → 第二章叙事
+      2: a('/video/chapter2end.mp4'), // 2-1 通关后 → chapter2end → 第三章叙事
+      4: a('/video/chapter3end.mp4'), // 3-2 通关后 → chapter3end → 第四章叙事
+      6: a('/video/chapter4end.mp4'), // 4-2 通关后 → chapter4end → 第五章叙事
+      8: a('/video/chapter5end.mp4'), // 5-2 通关后 → chapter5end → 第六章叙事
+      9: a('/video/chapter6end.mp4'), // 6-1 通关后 → chapter6end → 结束叙事
     };
     // 关卡索引 → 视频开始播放时淡入的下一章 BGM（视频期间完成 crossfade）
     const nextBgmMap: Record<number, string> = {
@@ -440,7 +441,7 @@ hud.setLangCallback((lang) => Locale.setLang(lang));
 const bgm = new BgmManager();
 bgm.preload(
   ['BGM-00', 'BGM-01', 'BGM-02', 'BGM-03', 'BGM-04', 'BGM-05', 'BGM-06'],
-  (id) => `/bgm/${id}.mp3`,
+  (id) => `${a('/bgm/')}${id}.mp3`,
 );
 
 // ── 音效管理 ──────────────────────────────────────────────────
@@ -894,7 +895,7 @@ function startGame(): void {
 
   // 视频 → 叙事（视频从全黑淡入 5s）
   const showVideoThenNarrative = () => {
-    videoScreen.show('/video/chapter1start.mp4', showNarrative, 5000);
+    videoScreen.show(a('/video/chapter1start.mp4'), showNarrative, 5000);
   };
 
   // 0.8s 渐黑完成后开始播放视频

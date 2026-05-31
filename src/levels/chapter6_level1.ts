@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 // 6-1：单关，影子连通 → 自动通关 + 角色变身/淡出剧情
 // 平台：左侧 X[-8, -4]、右侧 X[4, 8]，等高 y=6.25
@@ -14,12 +15,12 @@ export const chapter6Level1: LevelConfig = {
     { id: 'right', x:  3.45, y: 6.25, width: 9.1, height: 0.35 },
   ],
   // 门：放大到 displayHeight=3.5；y 下移 1.5
-  gate: { x: 6.25, y: 6.0, textureUrl: '/textures/gate_new.png', displayHeight: 3.5 },
+  gate: { x: 6.25, y: 6.0, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.5 },
 
   // ── 主角色组：女 (wife) + 男 (young, companion)，初始在左平台 ──
   walkerStart: { x: -6.5, y: 6.425 },
   walkerSheet: {
-    url: '/textures/wife_sheet.png',
+    url: a('/textures/wife_sheet.png'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2100,
@@ -29,7 +30,7 @@ export const chapter6Level1: LevelConfig = {
   companion: {
       start: { x: -7.3, y: 6.425 },
     sheet: {
-      url: '/textures/young_sheet.png',
+      url: a('/textures/young_sheet.png'),
       frameCount: 2,
       frameW: 1200,
       frameH: 2000,
@@ -48,7 +49,7 @@ export const chapter6Level1: LevelConfig = {
     {
        start: { x: -5.7, y: 6.425 },
       sheet: {
-        url: '/textures/dog_sheet.png',
+        url: a('/textures/dog_sheet.png'),
         frameCount: 2,
         frameW: 1600,
         frameH: 1200,
@@ -59,7 +60,7 @@ export const chapter6Level1: LevelConfig = {
        companion: {
         start: { x: -4.8, y: 6.425 },
         sheet: {
-          url: '/textures/cat_sheet.png',
+          url: a('/textures/cat_sheet.png'),
           frameCount: 2,
           frameW: 2000,
           frameH: 1400,
@@ -91,7 +92,7 @@ export const chapter6Level1: LevelConfig = {
       initialYOffset: -0.36,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 10, down: 6, left: 4, right: 4 },
-      modelUrl: '/models/watch.glb',
+      modelUrl: a('/models/watch.glb'),
       modelScale: 1.9,
       projectionScale: 2.97,
       useGlbProjection: true,

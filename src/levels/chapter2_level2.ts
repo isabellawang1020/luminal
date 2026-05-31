@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 export const chapter2Level2: LevelConfig = {
   name: '章节 2 - 关卡 2',
@@ -7,7 +8,7 @@ export const chapter2Level2: LevelConfig = {
     { id: 'middle-platform', x:  0,    y:  9.125, width: 3.5, height: 0.35 },
     { id: 'right-platform',  x:  6.45, y: 10.25,  width: 2.5, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 9.95, textureUrl: '/textures/gate_new.png', displayHeight: 3.12 },
+  gate: { x: 6.35, y: 9.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
   walkerStart: { x: -6.45, y: 8.175 },
   objects: [
     {
@@ -24,7 +25,7 @@ export const chapter2Level2: LevelConfig = {
       initialYOffset: 0.93,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 12, down: 8, left: 5, right: 5 },
-      modelUrl: '/models/4_2_2.glb',
+      modelUrl: a('/models/4_2_2.glb'),
       modelScale: 0.34,
       projectionScale: 1.3,
       useGlbProjection: true,
@@ -45,7 +46,7 @@ export const chapter2Level2: LevelConfig = {
       initialYOffset: 0.93,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 12, down: 8, left: 5, right: 5 },
-      modelUrl: '/models/4_2_2.glb',
+      modelUrl: a('/models/4_2_2.glb'),
       modelScale: 0.34,
       projectionScale: 1.3,
       useGlbProjection: true,
@@ -65,7 +66,7 @@ export const chapter2Level2: LevelConfig = {
   transitHintTextEn: '',
   persistentHint: true,
   walkerSheet: {
-    url: '/textures/boy_sheet.png',
+    url: a('/textures/boy_sheet.png'),
     frameCount: 5,
     frameW: 800,
     frameH: 1600,

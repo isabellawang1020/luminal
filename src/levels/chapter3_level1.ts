@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 // 3-1：三段平台 + 单个行李箱
 // 玩家先搭间隙 1 → 角色走过 → 移动行李箱到间隙 2 → 再搭桥 → 角色到终点
@@ -10,7 +11,7 @@ export const chapter3Level1: LevelConfig = {
     { id: 'middle-platform', x: -0.5, y: 10.25, width: 3.0, height: 0.35 },
     { id: 'right-platform',  x:  5.9, y: 10.25, width: 3.2, height: 0.35 },
   ],
-  gate: { x: 6.5, y: 9.95, textureUrl: '/textures/gate_new.png', displayHeight: 3.12 },
+  gate: { x: 6.5, y: 9.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
   walkerStart: { x: -6.95, y: 8.425 },
   objects: [
     {
@@ -27,7 +28,7 @@ export const chapter3Level1: LevelConfig = {
       initialYOffset: 0.46,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 18, down: 8, left: 2, right: 10 },
-      modelUrl: '/models/suitcase.glb',
+      modelUrl: a('/models/suitcase.glb'),
       modelScale: 0.49,
       projectionScale: 2.04,
       useGlbProjection: true,
@@ -45,7 +46,7 @@ export const chapter3Level1: LevelConfig = {
   hintText: '路还很长，先让影子抵达下一站',
   hintTextEn: 'The road is long. Let the shadow reach the next stop first.',
   walkerSheet: {
-    url: '/textures/young_sheet.png',
+    url: a('/textures/young_sheet.png'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,

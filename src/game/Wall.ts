@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { audioManager } from '@/audio/SfxManager';
+import { a } from '@/utils/asset';
 
 export interface WallData {
   /** 墙中心 X */
@@ -16,7 +17,7 @@ export interface WallData {
 let sharedWallTexture: THREE.Texture | null = null;
 function getWallTexture(): THREE.Texture {
   if (!sharedWallTexture) {
-    sharedWallTexture = new THREE.TextureLoader().load('/textures/wall.png');
+    sharedWallTexture = new THREE.TextureLoader().load(a('/textures/wall.png'));
     sharedWallTexture.wrapS = THREE.ClampToEdgeWrapping;
     sharedWallTexture.wrapT = THREE.ClampToEdgeWrapping;
     sharedWallTexture.colorSpace = THREE.SRGBColorSpace;

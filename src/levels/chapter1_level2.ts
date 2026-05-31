@@ -1,4 +1,5 @@
 import type { LevelConfig } from '@/game/Level';
+import { a } from '@/utils/asset';
 
 export const chapter1Level2: LevelConfig = {
   name: '章节 1 - 关卡 2',
@@ -6,7 +7,7 @@ export const chapter1Level2: LevelConfig = {
     { id: 'left-platform', x: -4.65, y: 10.25, width: 6.1, height: 0.35 },
     { id: 'right-platform', x: 4.65, y: 10.25, width: 6.1, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 9.95, textureUrl: '/textures/gate_new.png', displayHeight: 2.6 },
+  gate: { x: 6.35, y: 9.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 2.6 },
   walkerStart: { x: -6.45, y: 10.425 },
   objects: [
     {
@@ -22,7 +23,7 @@ export const chapter1Level2: LevelConfig = {
       initialYOffset: 1.36,
       wrapperExtraRotation: { y: Math.PI / 2, z: -Math.PI / 2 },
       moveLimit: { up: 8, down: 8, left: 5, right: 5 },
-      modelUrl: '/models/1_2.glb',
+      modelUrl: a('/models/1_2.glb'),
       modelScale: 0.59,
       projectionScale: 1.97,
       useGlbProjection: true,
@@ -35,7 +36,7 @@ export const chapter1Level2: LevelConfig = {
   hintText: '旋转奶瓶，让影子跨过那道空隙',
   hintTextEn: 'Turn the bottle, and let its shadow bridge the gap',
   walkerSheet: {
-    url: '/textures/baby_sheet.png',
+    url: a('/textures/baby_sheet.png'),
     frameCount: 4,
     frameW: 256,
     frameH: 192,
