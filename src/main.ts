@@ -22,6 +22,7 @@ import { VideoScreen } from '@/ui/VideoScreen';
 import { ZoneOverlay } from '@/ui/ZoneOverlay';
 import { Locale } from '@/core/Locale';
 import { a } from '@/utils/asset';
+import { ResourcePreloader } from '@/utils/ResourcePreloader';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 
@@ -152,7 +153,7 @@ function runChapter6Sequence(level: import('@/game/Level').Level): void {
   }
   // old_sheet 两份（用于女男变老人）—— 同一张 sheet，两个比例
   const oldSheet = {
-    url: a('/textures/old_sheet.png'),
+    url: a('/textures/old_sheet.webp'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,
@@ -439,9 +440,21 @@ Locale.onChange(() => {
 hud.setLangCallback((lang) => Locale.setLang(lang));
 // ── BGM 管理 ──────────────────────────────────────────────────
 const bgm = new BgmManager();
+
+// 优先加载 BGM-00（开始页面背景音乐）：以 blob 形式立即下载，
+// 不等后续 6 首 BGM 加载完成即可进入 Audio 队列。
+fetch(`${a('/bgm/')}BGM-00.m4a`)
+  .then((r) => r.blob())
+  .then((blob) => {
+    bgm.preloadBlob('BGM-00', blob);
+    bgm.crossfadeTo('BGM-00', 0);
+    console.log('[Main] BGM-00 ready, waiting for user interaction');
+  })
+  .catch((e) => console.warn('[Main] BGM-00 preload failed:', e));
+
 bgm.preload(
   ['BGM-00', 'BGM-01', 'BGM-02', 'BGM-03', 'BGM-04', 'BGM-05', 'BGM-06'],
-  (id) => `${a('/bgm/')}${id}.mp3`,
+  (id) => `${a('/bgm/')}${id}.m4a`,
 );
 
 // ── 音效管理 ──────────────────────────────────────────────────
@@ -455,9 +468,11 @@ const unlockBgm = () => {
   bgm.unlock();
   audioManager.unlock();
   window.removeEventListener('pointerdown', unlockBgm);
+  window.removeEventListener('pointermove', unlockBgm);
   window.removeEventListener('keydown', unlockBgm);
 };
 window.addEventListener('pointerdown', unlockBgm);
+window.addEventListener('pointermove', unlockBgm);
 window.addEventListener('keydown', unlockBgm);
 // 进入页面立刻切到开始页 BGM（unlock 之前会被排队，unlock 后开始）
 bgm.crossfadeTo('BGM-00', 0);
@@ -472,13 +487,12 @@ function getBgmForLevel(levelIndex: number): string {
 // 后续关卡切换时自动绑
 chapterManager.onLevelCreated = bindLevelCallbacks;
 chapterManager.onLevelActivated = (index) => {
-  // 关卡激活时显示提示词（此时关卡已切换完成，不会提前闪现）
   const activeLevel = chapterManager.activeLevel;
-  // 每次重新设置提示词（刷新 Locale 对应的翻译版本，防御 currentHint 过期）
   const displayHint = activeLevel.setHintText(
     activeLevel.config.hintText ?? '向上移动积木，让影子铺出第一道光路',
     activeLevel.config.hintTextEn ?? 'Lift the block upward, and let its shadow form the first path of light',
   );
+  console.log('[onLevelActivated]', { index, displayHint, noGuide: activeLevel.config.noGuide });
   zoneOverlay.resetHint(displayHint);
   setBackground(index);
   hud.setLevelLabel(getLevelDisplayLabel(index));
@@ -904,6 +918,72 @@ function startGame(): void {
 
 const startScreen = new StartScreen(overlayLayer);
 startScreen.onStart(startGame);
+
+const ASSET_URLS: string[] = [
+  a('/textures/baby_sheet.webp'),
+  a('/textures/boy_sheet.webp'),
+  a('/textures/young_sheet.webp'),
+  a('/textures/adult_sheet.webp'),
+  a('/textures/wife_sheet.webp'),
+  a('/textures/old_sheet.webp'),
+  a('/textures/dog_sheet.webp'),
+  a('/textures/cat_sheet.webp'),
+  a('/textures/walker_sheet.webp'),
+  a('/textures/wall.webp'),
+  a('/textures/gate_new.webp'),
+  a('/textures/ui/rotate_up.webp'),
+  a('/textures/ui/rotate_down.webp'),
+  a('/textures/ui/rotate_left.webp'),
+  a('/textures/ui/rotate_right.webp'),
+  a('/ui/righton.webp'),
+  a('/ui/lefton.webp'),
+  a('/chapter1_bg.jpg'),
+  a('/chapter2_bg.jpg'),
+  a('/chapter3_bg.jpg'),
+  a('/chapter4_bg.jpg'),
+  a('/chapter5_bg.jpg'),
+  a('/chapter6_bg.jpg'),
+  a('/models/1_1_trapezoid.glb'),
+  a('/models/1_2.glb'),
+  a('/models/bear.glb'),
+  a('/models/suitcase.glb'),
+  a('/models/train.glb'),
+  a('/models/glass.glb'),
+  a('/models/balloon.glb'),
+  a('/models/telescope.glb'),
+  a('/models/4_2_2.glb'),
+  a('/models/cake.glb'),
+  a('/models/plant.glb'),
+  a('/models/watch.glb'),
+  a('/models/candle.glb'),
+  a('/bgm/BGM-00.m4a'),
+  a('/bgm/BGM-01.m4a'),
+  a('/bgm/BGM-02.m4a'),
+  a('/bgm/BGM-03.m4a'),
+  a('/bgm/BGM-04.m4a'),
+  a('/bgm/BGM-05.m4a'),
+  a('/bgm/BGM-06.m4a'),
+  a('/sound/wall.m4a'),
+  a('/sound/pass.m4a'),
+  a('/sound/connected.m4a'),
+  a('/sound/switch.m4a'),
+  a('/sound/click.m4a'),
+  a('/video/chapter1start.mp4'),
+  a('/video/chapter1end2.mp4'),
+  a('/video/chapter2end.mp4'),
+  a('/video/chapter3end.mp4'),
+  a('/video/chapter4end.mp4'),
+  a('/video/chapter5end.mp4'),
+  a('/video/chapter6end.mp4'),
+];
+
+const preloader = new ResourcePreloader(ASSET_URLS);
+preloader.preload((progress) => {
+  const pct = Math.floor(progress.fraction * 100);
+  startScreen.updateProgress(progress.fraction, `${pct}%`);
+}).then(() => {
+  startScreen.ready();
+});
 
 // ── Tick ─────────────────────────────────────────────────────
 let previousTime = performance.now();

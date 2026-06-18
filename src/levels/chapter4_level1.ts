@@ -38,13 +38,13 @@ export const chapter4Level1: LevelConfig = {
     triggerRadius: 0.6,
     visualRadius: 0.22,
   },
-  gate: { x: 6.5, y: 11.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
+  gate: { x: 6.5, y: 11.95, textureUrl: a('/textures/gate_new.webp'), displayHeight: 3.12 },
   walkerStart: { x: -6.95, y: 7.425 },
   // 狗从一开始就跟随主角
   companion: {
     start: { x: -6.0, y: 7.425 }, // 紧跟主角后面
     sheet: {
-      url: a('/textures/dog_sheet.png'),
+      url: a('/textures/dog_sheet.webp'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -89,7 +89,7 @@ export const chapter4Level1: LevelConfig = {
   transitHintTextEn: '',
   persistentHint: true, // 关卡全程提示词不消失
   walkerSheet: {
-    url: a('/textures/young_sheet.png'),
+    url: a('/textures/young_sheet.webp'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,

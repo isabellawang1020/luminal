@@ -7,7 +7,7 @@ export const chapter2Level1: LevelConfig = {
     { id: 'left-platform', x: -5.2, y: 7.25, width: 5, height: 0.35 },
     { id: 'right-platform', x: 5.2, y: 9.25, width: 5, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 8.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
+  gate: { x: 6.35, y: 8.95, textureUrl: a('/textures/gate_new.webp'), displayHeight: 3.12 },
   walkerStart: { x: -6.45, y: 7.425 },
   objects: [
     {
@@ -37,7 +37,7 @@ export const chapter2Level1: LevelConfig = {
   hintTextEn: 'Try another angle. The shadow will find a way.',
   persistentHint: true,
   walkerSheet: {
-    url: a('/textures/boy_sheet.png'),
+    url: a('/textures/boy_sheet.webp'),
     frameCount: 5,
     frameW: 800,
     frameH: 1600,

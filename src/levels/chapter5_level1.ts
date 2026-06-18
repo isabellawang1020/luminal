@@ -47,11 +47,11 @@ export const chapter5Level1: LevelConfig = {
     },
   ],
   // 门在右侧平台中央，初始可见（无需 gateInitialHidden）
-  gate: { x: 6.5, y: 8.5, textureUrl: a('/textures/gate_new.png'), displayHeight: 4.125 },
+  gate: { x: 6.5, y: 8.5, textureUrl: a('/textures/gate_new.webp'), displayHeight: 4.125 },
   // 主角色组：adult + 狗，站在左下平台
   walkerStart: { x: -6.0, y: 7.425 },
   walkerSheet: {
-    url: a('/textures/adult_sheet.png'),
+    url: a('/textures/adult_sheet.webp'),
     frameCount: 2,
     frameW: 1100,
     frameH: 2000,
@@ -61,7 +61,7 @@ export const chapter5Level1: LevelConfig = {
   companion: {
     start: { x: -5.5, y: 7.425 },
     sheet: {
-      url: a('/textures/dog_sheet.png'),
+      url: a('/textures/dog_sheet.webp'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -78,7 +78,7 @@ export const chapter5Level1: LevelConfig = {
     {
       start: { x: -5.2, y: 7.425 },
       sheet: {
-        url: a('/textures/wife_sheet.png'),
+        url: a('/textures/wife_sheet.webp'),
         frameCount: 2,
         frameW: 1200,
         frameH: 2100,
@@ -89,7 +89,7 @@ export const chapter5Level1: LevelConfig = {
       companion: {
         start: { x: -4.7, y: 7.425 },
         sheet: {
-          url: a('/textures/cat_sheet.png'),
+          url: a('/textures/cat_sheet.webp'),
           frameCount: 2,
           frameW: 2000,
           frameH: 1400,

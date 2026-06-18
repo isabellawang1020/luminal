@@ -78,4 +78,9 @@ export class IdleIndicator {
     const mat = this.mesh.material as THREE.MeshBasicMaterial;
     mat.opacity = 0.7 + Math.sin(this.time * 3.2) * 0.22;
   }
+
+  dispose(): void {
+    this.mesh.geometry.dispose();
+    (this.mesh.material as THREE.Material).dispose();
+  }
 }

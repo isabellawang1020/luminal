@@ -42,3 +42,9 @@ coverage/
 # 临时文件
 tmp/
 temp/
+.vercel
+
+# 构建与备份目录
+dist-deploy/
+public-backup/
+handoff/

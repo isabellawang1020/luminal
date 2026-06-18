@@ -116,4 +116,18 @@ export class Gate {
       this.spriteMat.opacity = completed ? 1 : 0.88 + Math.sin(this.elapsed * 2.5) * 0.08;
     }
   }
+
+  dispose(): void {
+    this.group.traverse((child) => {
+      const mesh = child as any;
+      if (mesh.geometry) mesh.geometry.dispose();
+      if (mesh.material) {
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        for (const m of mats) {
+          if (m.map) m.map.dispose();
+          m.dispose();
+        }
+      }
+    });
+  }
 }

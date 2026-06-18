@@ -11,13 +11,13 @@ export const chapter3Level2: LevelConfig = {
     { id: 'middle-platform', x: -0.5, y:  9.7,  width: 2.5, height: 0.35 },
     { id: 'right-platform',  x:  6.5, y:  8.25, width: 2.5, height: 0.35 },
   ],
-  gate: { x: 6.5, y: 7.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
+  gate: { x: 6.5, y: 7.95, textureUrl: a('/textures/gate_new.webp'), displayHeight: 3.12 },
   walkerStart: { x: -6.95, y: 10.525 },
   // 狗的初始位置在中间平台，等待主角到来后跟随
   companion: {
     start: { x: -0.5, y: 9.875 }, // 中间平台顶面（y=9.7 + 0.175）
     sheet: {
-      url: a('/textures/dog_sheet.png'),
+      url: a('/textures/dog_sheet.webp'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -60,7 +60,7 @@ export const chapter3Level2: LevelConfig = {
   transitHintText: '继续铺路，带着伙伴一起向前',
   transitHintTextEn: 'Keep making the path, and bring your companion with you',
   walkerSheet: {
-    url: a('/textures/young_sheet.png'),
+    url: a('/textures/young_sheet.webp'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,

@@ -7,7 +7,7 @@ export const chapter1Level2: LevelConfig = {
     { id: 'left-platform', x: -4.65, y: 10.25, width: 6.1, height: 0.35 },
     { id: 'right-platform', x: 4.65, y: 10.25, width: 6.1, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 9.95, textureUrl: a('/textures/gate_new.png'), displayHeight: 2.6 },
+  gate: { x: 6.35, y: 9.95, textureUrl: a('/textures/gate_new.webp'), displayHeight: 2.6 },
   walkerStart: { x: -6.45, y: 10.425 },
   objects: [
     {
@@ -36,7 +36,7 @@ export const chapter1Level2: LevelConfig = {
   hintText: '旋转奶瓶，让影子跨过那道空隙',
   hintTextEn: 'Turn the bottle, and let its shadow bridge the gap',
   walkerSheet: {
-    url: a('/textures/baby_sheet.png'),
+    url: a('/textures/baby_sheet.webp'),
     frameCount: 4,
     frameW: 256,
     frameH: 192,

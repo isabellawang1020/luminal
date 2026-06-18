@@ -31,7 +31,7 @@ export const chapter5Level2: LevelConfig = {
     { x: -3, y: 6.5, width: 3.5, height: 4.0 },
   ],
   // 门：再往下一点
-  gate: { x: 6.5, y: 5.825, textureUrl: a('/textures/gate_new.png'), displayHeight: 4.125 },
+  gate: { x: 6.5, y: 5.825, textureUrl: a('/textures/gate_new.webp'), displayHeight: 4.125 },
 
   // ── 按钮：buttons[0]=扳手  buttons[1]=机关1(显示物品)  buttons[2]=机关2(移除墙) ──
   buttons: [
@@ -43,8 +43,8 @@ export const chapter5Level2: LevelConfig = {
       visualRadius: 0.18,
       mode: 'toggle',
       initialToggleState: 'A',
-      imageA: a('/ui/righton.png'),
-      imageB: a('/ui/lefton.png'),
+      imageA: a('/ui/righton.webp'),
+      imageB: a('/ui/lefton.webp'),
       imageWidth: 2.8,
       imageHeight: 1.2,
     },
@@ -115,7 +115,7 @@ export const chapter5Level2: LevelConfig = {
   // 女性在前：朝右走时 wife 在右、young 在左后方（companion 默认 followSide=-1）
   walkerStart: { x: -6.0, y: 10.425 },
   walkerSheet: {
-    url: a('/textures/wife_sheet.png'),
+    url: a('/textures/wife_sheet.webp'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2100,
@@ -125,7 +125,7 @@ export const chapter5Level2: LevelConfig = {
   companion: {
     start: { x: -7.0, y: 10.425 },
     sheet: {
-      url: a('/textures/young_sheet.png'),
+      url: a('/textures/young_sheet.webp'),
       frameCount: 2,
       frameW: 1200,
       frameH: 2000,
@@ -144,7 +144,7 @@ export const chapter5Level2: LevelConfig = {
     {
       start: { x: 5.5, y: 6.425 },
       sheet: {
-        url: a('/textures/cat_sheet.png'),
+        url: a('/textures/cat_sheet.webp'),
         frameCount: 2,
         frameW: 2000,
         frameH: 1400,
@@ -157,7 +157,7 @@ export const chapter5Level2: LevelConfig = {
         // 狗起始位：猫 x=5.5，狗 x=4.5（间距 1.0）
         start: { x: 4.5, y: 6.425 },
         sheet: {
-          url: a('/textures/dog_sheet.png'),
+          url: a('/textures/dog_sheet.webp'),
           frameCount: 2,
           frameW: 1600,
           frameH: 1200,

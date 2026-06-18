@@ -76,21 +76,9 @@ export class ZoneOverlay {
     parent.append(this.hintLabel);
 
     // 监控 hintLabel style 变化，定位谁在恢复显示
-    new MutationObserver((mutations) => {
-      if (!this.hintHidden) return;
-      for (const m of mutations) {
-        if (m.type === 'attributes' && m.attributeName === 'style') {
-          const vis = this.hintLabel.style.visibility;
-          const op = this.hintLabel.style.opacity;
-          if (vis !== 'hidden' || op !== '0') {
-            console.warn('[ZoneOverlay] hintLabel restored after hideHint!', 'visibility:', vis, 'opacity:', op, new Error().stack);
-            // 立即重新隐藏
-            this.hintLabel.style.visibility = 'hidden';
-            this.hintLabel.style.opacity = '0';
-          }
-        }
-      }
-    }).observe(this.hintLabel, { attributes: true, attributeFilter: ['style'] });
+    // [debug-only] 生产环境不再注册 MutationObserver：
+    // 该 Observer 本为调试辅助，但微任务时序会在 resetHint → style 赋值间
+    // 误判并强制 visibility=hidden / opacity=0，导致新关卡提示词消失。
 
     this.warningLabel = document.createElement('div');
     this.warningLabel.textContent = Locale.t('角色正站在影子上，移动物品会让道路消散', 'A character is standing on a shadow. Moving the object will make the path fade.');
@@ -137,7 +125,15 @@ export class ZoneOverlay {
 
   fadeIn(duration: number): void {
     this.hintHidden = false;
+    // 防御：如果 hintLabel 在上一次 hideHint 期间被 remove，这里补回 DOM
+    if (!this.hintLabel.isConnected) {
+      this.parent.append(this.hintLabel);
+    }
+    // 先取消残留的 CSS transition，避免上一次 fadeOut 的过渡拖慢这次显示
+    this.hintLabel.style.transition = 'none';
+    this.hintLabel.style.visibility = 'visible';
     this.hintLabel.style.opacity = '1';
+    console.log('[ZoneOverlay] fadeIn', { hintHidden: this.hintHidden, opacity: this.hintLabel.style.opacity, isConnected: this.hintLabel.isConnected });
     this.zone.style.transition = 'none';
     this.zone.style.opacity = '0';
     window.clearTimeout(this.fadeTimer);
@@ -220,12 +216,29 @@ export class ZoneOverlay {
   }
 
   resetHint(text?: string): void {
+    // 先清除上一次关卡遗留的 warning / fade 定时器，
+    // 防止旧定时器在 resetHint 后异步触发 hideWarning/fadeOut 把新提示词隐藏
+    if (this.warningTimer) {
+      window.clearTimeout(this.warningTimer);
+      this.warningTimer = 0;
+    }
+    this.warningLabel.style.opacity = '0';
+    this.warningLabel.style.transition = 'none';
+
     if (text) this.hintLabel.textContent = text;
     this.hintHidden = false;
     if (!this.hintLabel.isConnected) {
       this.parent.append(this.hintLabel);
     }
+    this.hintLabel.style.transition = 'none';
+    this.hintLabel.style.visibility = 'visible';
     this.hintLabel.style.opacity = '1';
+    console.log('[ZoneOverlay] resetHint', {
+      text,
+      isConnected: this.hintLabel.isConnected,
+      opacity: this.hintLabel.style.opacity,
+      visibility: this.hintLabel.style.visibility,
+    });
   }
 
   showWarning(): void {
@@ -234,6 +247,9 @@ export class ZoneOverlay {
     this.hintLabel.style.opacity = '0';
     this.warningLabel.style.transition = 'opacity 0.2s ease';
     this.warningLabel.style.opacity = '1';
+    this.warningTimer = window.setTimeout(() => {
+      this.hideWarning();
+    }, 2500);
   }
 
   hideWarning(): void {

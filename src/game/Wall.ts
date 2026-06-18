@@ -17,7 +17,7 @@ export interface WallData {
 let sharedWallTexture: THREE.Texture | null = null;
 function getWallTexture(): THREE.Texture {
   if (!sharedWallTexture) {
-    sharedWallTexture = new THREE.TextureLoader().load(a('/textures/wall.png'));
+    sharedWallTexture = new THREE.TextureLoader().load(a('/textures/wall.webp'));
     sharedWallTexture.wrapS = THREE.ClampToEdgeWrapping;
     sharedWallTexture.wrapT = THREE.ClampToEdgeWrapping;
     sharedWallTexture.colorSpace = THREE.SRGBColorSpace;

@@ -44,6 +44,11 @@ export class ShadowMask {
     this.renderTarget.texture.generateMipmaps = false;
   }
 
+  dispose(): void {
+    this.renderTarget.dispose();
+    this.renderTarget.texture.dispose();
+  }
+
   get texture(): THREE.Texture {
     return this.renderTarget.texture;
   }

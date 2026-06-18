@@ -71,10 +71,10 @@ export class ObjectControls {
       left: () => this.callbacks.onRotateY(ROTATION_STEP),
       right: () => this.callbacks.onRotateY(-ROTATION_STEP),
     }, {
-      up:    a('/textures/ui/rotate_up.png'),
-      down:  a('/textures/ui/rotate_down.png'),
-      left:  a('/textures/ui/rotate_left.png'),
-      right: a('/textures/ui/rotate_right.png'),
+      up:    a('/textures/ui/rotate_up.webp'),
+      down:  a('/textures/ui/rotate_down.webp'),
+      left:  a('/textures/ui/rotate_left.webp'),
+      right: a('/textures/ui/rotate_right.webp'),
     });
     this.rotateBtns = rotateBtns;
     this.rotationPad = rotatePad;

@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
-  base: '/luminal/',
+  base: '/',
   publicDir: 'public',
   resolve: {
     alias: {

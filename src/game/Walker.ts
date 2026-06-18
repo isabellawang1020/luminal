@@ -4,7 +4,7 @@ import { IdleIndicator } from '@/game/IdleIndicator';
 import { a } from '@/utils/asset';
 
 const DEFAULT_SHEET: WalkerSheet = {
-  url: a('/textures/walker_sheet.png'),
+  url: a('/textures/walker_sheet.webp'),
   frameCount: 5,
   frameW: 128,
   frameH: 256,
@@ -97,6 +97,13 @@ export class Walker {
     }
 
     this.group.position.set(start.x, start.y + this.yOffset, 0.24);
+  }
+
+  dispose(): void {
+    this.sprite.geometry.dispose();
+    if (this.spriteMat.map) this.spriteMat.map.dispose();
+    this.spriteMat.dispose();
+    this.indicator?.dispose();
   }
 
   get position(): THREE.Vector2 {

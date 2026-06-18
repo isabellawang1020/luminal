@@ -13,7 +13,7 @@ export const chapter4Level2: LevelConfig = {
     { id: 'right-platform',  x:  6.5, y:  7.25, width: 2.5, height: 0.35 },
   ],
   // 门初始隐藏，两个机关同时绿色时才出现
-  gate: { x: 0, y: 9.45, textureUrl: a('/textures/gate_new.png'), displayHeight: 3.12 },
+  gate: { x: 0, y: 9.45, textureUrl: a('/textures/gate_new.webp'), displayHeight: 3.12 },
   gateInitialHidden: true,
   // 两个机关（continuous 模式：仅在角色站在上面时变绿，离开变回橙色）
   buttons: [
@@ -23,7 +23,7 @@ export const chapter4Level2: LevelConfig = {
   // 主角色组：男 young + 狗，位于左平台
   walkerStart: { x: -6.5, y: 11.125 },
   walkerSheet: {
-    url: a('/textures/young_sheet.png'),
+    url: a('/textures/young_sheet.webp'),
     frameCount: 2,
     frameW: 1200,
     frameH: 2000,
@@ -33,7 +33,7 @@ export const chapter4Level2: LevelConfig = {
   companion: {
     start: { x: -6.0, y: 11.125 },
     sheet: {
-      url: a('/textures/dog_sheet.png'),
+      url: a('/textures/dog_sheet.webp'),
       frameCount: 2,
       frameW: 1600,
       frameH: 1200,
@@ -50,7 +50,7 @@ export const chapter4Level2: LevelConfig = {
     {
       start: { x: 6.5, y: 7.425 },
       sheet: {
-        url: a('/textures/wife_sheet.png'),
+        url: a('/textures/wife_sheet.webp'),
         frameCount: 2,
         frameW: 1200,
         frameH: 2100,
@@ -61,7 +61,7 @@ export const chapter4Level2: LevelConfig = {
       companion: {
         start: { x: 6.0, y: 7.425 },
         sheet: {
-          url: a('/textures/cat_sheet.png'),
+          url: a('/textures/cat_sheet.webp'),
           frameCount: 2,
           frameW: 2000,
           frameH: 1400,

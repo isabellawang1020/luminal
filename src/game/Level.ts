@@ -1326,8 +1326,57 @@ export class Level {
 
   dispose(): void {
     this.sceneManager.scene.remove(this.rootGroup);
-    for (const object of this.shadowObjects) {
-      object.shadowMaskMesh.removeFromParent();
+    for (const obj of [
+      this.rootGroup,
+      ...(Array.from(this.shadowObjects).map(o => o.group)),
+    ]) {
+      Level.traverseDispose(obj);
+    }
+    for (const o of this.shadowObjects) {
+      o.shadowMaskMesh.removeFromParent();
+      o.shadowMaskMesh.geometry.dispose();
+      (o.shadowMaskMesh.material as THREE.Material).dispose();
+      o.shadowVisualMesh.geometry.dispose();
+      (o.shadowVisualMesh.material as THREE.Material).dispose();
+      (o.shadowVisualMesh.material as any).map?.dispose();
+    }
+    this.shadowMask.dispose();
+    this.walker.dispose();
+    if (this.companion) this.companion.walker.dispose();
+    for (const g of this.extraGroups) {
+      g.walker.dispose();
+      g.companion?.walker.dispose();
+    }
+    this.gate.dispose();
+    for (const p of this.platforms) {
+      p.mesh.geometry.dispose();
+      (p.mesh.material as THREE.Material).dispose();
+    }
+    for (const hp of this.hiddenPlatforms) {
+      hp.mesh.geometry.dispose();
+      (hp.mesh.material as THREE.Material).dispose();
+    }
+    this.hintMesh.geometry.dispose();
+    (this.hintMesh.material as THREE.Material).dispose();
+  }
+
+  private static traverseDispose(obj: THREE.Object3D): void {
+    for (const child of obj.children) {
+      Level.traverseDispose(child);
+      obj.remove(child);
+    }
+    const mesh = obj as any;
+    if (mesh.geometry) mesh.geometry.dispose();
+    if (mesh.material) {
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      for (const m of mats) {
+        if (m.map) m.map.dispose();
+        if (m.normalMap) m.normalMap.dispose();
+        if (m.roughnessMap) m.roughnessMap.dispose();
+        if (m.metalnessMap) m.metalnessMap.dispose();
+        if (m.emissiveMap) m.emissiveMap.dispose();
+        m.dispose();
+      }
     }
   }
 

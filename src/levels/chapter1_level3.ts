@@ -7,7 +7,7 @@ export const chapter1Level3: LevelConfig = {
     { id: 'left-platform', x: -4.65, y: 7.25, width: 6.1, height: 0.35 },
     { id: 'right-platform', x: 4.65, y: 7.25, width: 6.1, height: 0.35 },
   ],
-  gate: { x: 6.35, y: 7.425, textureUrl: a('/textures/gate_new.png'), displayHeight: 1.8 },
+  gate: { x: 6.35, y: 7.425, textureUrl: a('/textures/gate_new.webp'), displayHeight: 1.8 },
   walkerStart: { x: -6.45, y: 7.425 },
   objects: [
     {
@@ -33,7 +33,7 @@ export const chapter1Level3: LevelConfig = {
   hintText: '移动推车，再转动它，让影子为你铺路',
   hintTextEn: 'Move the stroller, then turn it, and let its shadow make the way',
   walkerSheet: {
-    url: a('/textures/baby_sheet.png'),
+    url: a('/textures/baby_sheet.webp'),
     frameCount: 4,
     frameW: 256,
     frameH: 192,

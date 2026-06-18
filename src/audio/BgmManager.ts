@@ -33,6 +33,16 @@ export class BgmManager {
     }
   }
 
+  /** 用 blob 直接注入 BGM（优先加载时使用，避免等待整批 BGM 完成） */
+  preloadBlob(id: string, blob: Blob): void {
+    if (this.audios.has(id)) return;
+    const a = new Audio(URL.createObjectURL(blob));
+    a.loop = true;
+    a.preload = 'auto';
+    a.volume = 0;
+    this.audios.set(id, a);
+  }
+
   /** 用户首次交互后调用：若 autoplay 之前被拦截，此时补播 */
   unlock(): void {
     if (this.unlocked) return;
